@@ -1,69 +1,179 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Product Price List</title>
-<link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Price List - Order System</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* Tambahan sedikit style agar tabel rekap terlihat bagus */
+        .rekap-container {
+            background: linear-gradient(145deg, #111, #1c1c1c);
+            border-radius: 20px;
+            padding: 20px;
+            margin: 20px auto;
+            width: 90%;
+            border: 2px solid #00ffff;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            color: white;
+            margin-top: 10px;
+        }
+        th {
+            background-color: #00ffff;
+            color: black;
+            padding: 12px;
+            text-align: left;
+        }
+        td {
+            padding: 10px;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+        }
+        tr:hover {
+            background-color: rgba(0, 255, 255, 0.05);
+        }
+    </style>
 </head>
 <body>
 
-<div class="header">
-    <h1>✨ PRODUCT PRICE LIST ✨</h1>
-</div>
-
-<div class="order-form">
-    <input type="text" id="namaPemesan" placeholder="Masukkan Nama Pemesan">
-</div>
-
-<div class="summary">
-    Nama: <span id="displayNama">-</span><br>
-    Total Item: <span id="totalItem">0</span> |
-    Total Harga: B <span id="totalHarga">0</span>
-    <br>
-    <button class="reset-btn" onclick="resetPesanan()">Reset Pesanan</button>
-</div>
-
-<div class="product-container">
-
-    <div class="product-card">
-        <img src="https://down-id.img.susercontent.com/file/b2259a1c15492387e14a0ccfac4fae44" alt="Susu Kedelai">
-        <h3>SUSU KEDELAI</h3>
-        <div class="price">B 50 / botol</div>
-        <input type="number" min="1" value="1" class="quantity" id="qty1">
-        <br>
-        <button onclick="tambahPesanan(50,'qty1')">Tambah</button>
+    <div class="header">
+        <h1>✨ PRODUCT PRICE LIST ✨</h1>
     </div>
 
-    <div class="product-card">
-        <img src="https://img06.weeecdn.com/item/image/071/142/33FADE5517F5CB2E.jpeg!c750x0.jpeg" alt="Peach Gum">
-        <h3>PEACH GUM</h3>
-        <div class="price">B 50 / botol</div>
-        <input type="number" min="1" value="1" class="quantity" id="qty2">
-        <br>
-        <button onclick="tambahPesanan(50,'qty2')">Tambah</button>
+    <div class="order-form">
+        <input type="text" id="namaPemesan" placeholder="Masukkan Nama Pemesan">
     </div>
 
-    <div class="product-card">
-        <img src="https://i.pinimg.com/736x/72/03/e6/7203e6b32cf67f664055445ed06cee44.jpg" alt="Matcha">
-        <h3>MATCHA</h3>
-        <div class="price">B 50 / botol</div>
-        <input type="number" min="1" value="1" class="quantity" id="qty3">
+    <div class="summary">
+        Nama: <span id="displayNama">-</span><br>
+        Total Item: <span id="totalItem">0</span> |
+        Total Harga: B <span id="totalHarga">0</span>
         <br>
-        <button onclick="tambahPesanan(50,'qty3')">Tambah</button>
+        <button class="reset-btn" onclick="resetPesanan()">Reset Semua Data</button>
     </div>
 
-    <div class="product-card">
-        <img src="https://i.gojekapi.com/darkroom/gofood-indonesia/v2/images/uploads/31ab0769-5603-4e27-88eb-36c8f5828edd_cd05a52f-e51f-473c-a1ff-e54bbb79760e_Go-Biz_20200420_184718.jpeg?auto=format" alt="Kopi Koktong">
-        <h3>KOPI KOKTONG</h3>
-        <div class="price">B 50 / botol</div>
-        <input type="number" min="1" value="1" class="quantity" id="qty4">
-        <br>
-        <button onclick="tambahPesanan(50,'qty4')">Tambah</button>
+    <div class="product-container">
+
+        <div class="product-card">
+            <img src="https://down-id.img.susercontent.com/file/b2259a1c15492387e14a0ccfac4fae44" alt="Susu Kedelai">
+            <h3>SUSU KEDELAI</h3>
+            <div class="price">B 50 / botol</div>
+            <input type="number" min="1" value="1" class="quantity" id="qty1">
+            <br>
+            <button onclick="tambahPesanan(50,'qty1')">Tambah</button>
+        </div>
+
+        <div class="product-card">
+            <img src="https://img06.weeecdn.com/item/image/071/142/33FADE5517F5CB2E.jpeg!c750x0.jpeg" alt="Peach Gum">
+            <h3>PEACH GUM</h3>
+            <div class="price">B 50 / botol</div>
+            <input type="number" min="1" value="1" class="quantity" id="qty2">
+            <br>
+            <button onclick="tambahPesanan(50,'qty2')">Tambah</button>
+        </div>
+
+        <div class="product-card">
+            <img src="https://i.pinimg.com/736x/72/03/e6/7203e6b32cf67f664055445ed06cee44.jpg" alt="Matcha">
+            <h3>MATCHA</h3>
+            <div class="price">B 50 / botol</div>
+            <input type="number" min="1" value="1" class="quantity" id="qty3">
+            <br>
+            <button onclick="tambahPesanan(50,'qty3')">Tambah</button>
+        </div>
+
+        <div class="product-card">
+            <img src="https://i.gojekapi.com/darkroom/gofood-indonesia/v2/images/uploads/31ab0769-5603-4e27-88eb-36c8f5828edd_cd05a52f-e51f-473c-a1ff-e54bbb79760e_Go-Biz_20200420_184718.jpeg?auto=format" alt="Kopi Koktong">
+            <h3>KOPI KOKTONG</h3>
+            <div class="price">B 50 / botol</div>
+            <input type="number" min="1" value="1" class="quantity" id="qty4">
+            <br>
+            <button onclick="tambahPesanan(50,'qty4')">Tambah</button>
+        </div>
+
     </div>
 
-</div>
+    <div class="rekap-container">
+        <h3 style="color: #00ffff; text-align: center;">📋 DAFTAR NAMA & PESANAN</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Nama Pemesan</th>
+                    <th>Produk</th>
+                    <th>Qty</th>
+                    <th>Subtotal</th>
+                </tr>
+            </thead>
+            <tbody id="tabelRekap">
+                </tbody>
+        </table>
+    </div>
 
-<script src="script.js"></script>
+    <script>
+        let totalItemSemua = 0;
+        let totalHargaSemua = 0;
+
+        const namaInput = document.getElementById('namaPemesan');
+        const displayNama = document.getElementById('displayNama');
+        const tabelRekap = document.getElementById('tabelRekap');
+
+        // Menampilkan nama di summary saat diketik
+        namaInput.addEventListener('input', function() {
+            displayNama.innerText = namaInput.value || "-";
+        });
+
+        function tambahPesanan(harga, qtyId) {
+            const nama = namaInput.value.trim();
+            const qtyInput = document.getElementById(qtyId);
+            const qty = parseInt(qtyInput.value);
+            
+            // Mengambil nama produk dari judul H3 di kartu produk tersebut
+            const namaProduk = qtyInput.parentElement.querySelector('h3').innerText;
+
+            if (nama === "") {
+                alert("Silakan masukkan Nama Pemesan terlebih dahulu!");
+                return;
+            }
+
+            if (qty > 0) {
+                // 1. Update Angka Summary di Atas
+                totalItemSemua += qty;
+                totalHargaSemua += (harga * qty);
+                
+                document.getElementById('totalItem').innerText = totalItemSemua;
+                document.getElementById('totalHarga').innerText = totalHargaSemua.toLocaleString();
+
+                // 2. Tambahkan Baris ke Tabel Rekap di Bawah
+                const row = tabelRekap.insertRow();
+                row.innerHTML = `
+                    <td>${nama}</td>
+                    <td>${namaProduk}</td>
+                    <td>${qty}</td>
+                    <td>B ${(harga * qty).toLocaleString()}</td>
+                `;
+
+                // Reset field qty kembali ke 1 setelah ditambah
+                qtyInput.value = 1;
+            } else {
+                alert("Jumlah minimal adalah 1");
+            }
+        }
+
+        function resetPesanan() {
+            if (confirm("Hapus semua daftar pesanan?")) {
+                totalItemSemua = 0;
+                totalHargaSemua = 0;
+                namaInput.value = "";
+                displayNama.innerText = "-";
+                document.getElementById('totalItem').innerText = "0";
+                document.getElementById('totalHarga').innerText = "0";
+                tabelRekap.innerHTML = "";
+            }
+        }
+    </script>
+
 </body>
 </html>
