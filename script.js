@@ -1,35 +1,45 @@
-let totalItem = 0;
-let totalHarga = 0;
-
-const namaInput = document.getElementById('namaPemesan');
-const displayNama = document.getElementById('displayNama');
-const totalItemElement = document.getElementById('totalItem');
-const totalHargaElement = document.getElementById('totalHarga');
-
-// Update nama pemesan secara otomatis saat diketik
-namaInput.addEventListener('input', function() {
-    displayNama.innerText = namaInput.value || "-";
-});
+let totalItemSemua = 0;
+let totalHargaSemua = 0;
 
 function tambahPesanan(harga, qtyId) {
+    const nama = document.getElementById('namaPemesan').value.trim();
     const qty = parseInt(document.getElementById(qtyId).value);
-    
+    const namaProduk = document.getElementById(qtyId).parentElement.querySelector('h3').innerText;
+
+    if (nama === "") {
+        alert("Masukkan Nama Pemesan dulu!");
+        return;
+    }
+
     if (qty > 0) {
-        totalItem += qty;
-        totalHarga += (harga * qty);
+        // 1. Update Summary Atas
+        totalItemSemua += qty;
+        totalHargaSemua += (harga * qty);
+        document.getElementById('totalItem').innerText = totalItemSemua;
+        document.getElementById('totalHarga').innerText = totalHargaSemua.toLocaleString();
+
+        // 2. Tambah ke Tabel Rekap di Bawah
+        const tabel = document.getElementById('tabelRekap');
+        const row = tabel.insertRow();
         
-        totalItemElement.innerText = totalItem;
-        totalHargaElement.innerText = totalHarga.toLocaleString();
-        
-        alert("Pesanan ditambahkan!");
+        row.innerHTML = `
+            <td style="padding: 8px;">${nama}</td>
+            <td style="padding: 8px;">${qty}x ${namaProduk}</td>
+            <td style="padding: 8px;">B ${(harga * qty).toLocaleString()}</td>
+        `;
+
+        alert(`Pesanan ${nama} berhasil dicatat!`);
     }
 }
 
 function resetPesanan() {
-    totalItem = 0;
-    totalHarga = 0;
-    namaInput.value = "";
-    displayNama.innerText = "-";
-    totalItemElement.innerText = "0";
-    totalHargaElement.innerText = "0";
+    if (confirm("Hapus semua data pesanan?")) {
+        totalItemSemua = 0;
+        totalHargaSemua = 0;
+        document.getElementById('namaPemesan').value = "";
+        document.getElementById('displayNama').innerText = "-";
+        document.getElementById('totalItem').innerText = "0";
+        document.getElementById('totalHarga').innerText = "0";
+        document.getElementById('tabelRekap').innerHTML = "";
+    }
 }
