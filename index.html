@@ -3,50 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Product Price List - Rekap Pesanan</title>
+    <title>Product Price List - Full Menu</title>
     <link rel="stylesheet" href="style.css">
     <style>
-        /* Desain Tabel Rekap agar serasi dengan kartu produk */
+        /* Styling Tabel Rekap */
         .rekap-section {
             background: linear-gradient(145deg, #111, #1c1c1c);
             border-radius: 20px;
             padding: 20px;
             margin: 30px auto;
             width: 95%;
-            max-width: 800px;
+            max-width: 900px;
             border: 2px solid #00ffff;
             box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
             color: white;
         }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-
-        th {
-            background-color: #00ffff;
-            color: #000;
-            padding: 12px;
-            text-transform: uppercase;
-            font-size: 14px;
-        }
-
-        td {
-            padding: 12px;
-            border-bottom: 1px solid rgba(0, 255, 255, 0.1);
-            text-align: center;
-        }
-
-        .empty-row {
-            color: #666;
-            font-style: italic;
-        }
-
-        tr:hover {
-            background: rgba(0, 255, 255, 0.05);
-        }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th { background-color: #00ffff; color: #000; padding: 12px; text-transform: uppercase; }
+        td { padding: 12px; border-bottom: 1px solid rgba(0, 255, 255, 0.1); text-align: center; }
+        .empty-row { color: #666; font-style: italic; }
     </style>
 </head>
 <body>
@@ -56,13 +31,13 @@
     </div>
 
     <div class="order-form">
-        <input type="text" id="namaPemesan" placeholder="Ketik Nama Kamu di Sini...">
+        <input type="text" id="namaPemesan" placeholder="Ketik Nama Pemesan...">
     </div>
 
     <div class="summary">
-        <strong>Pemesan Saat Ini:</strong> <span id="displayNama">-</span><br>
-        Total Item (Global): <span id="totalItem">0</span> |
-        Total Harga (Global): B <span id="totalHarga">0</span>
+        <strong>Status:</strong> <span id="displayNama">-</span><br>
+        Total Item: <span id="totalItem">0</span> |
+        Total Harga: B <span id="totalHarga">0</span>
         <br>
         <button class="reset-btn" onclick="resetPesanan()">Hapus Semua Rekapan</button>
     </div>
@@ -101,13 +76,12 @@
         </div>
 
         <div class="product-card">
-            <img src="https://media.karousell.com/media/photos/products/2020/5/29/thai_milk_tea_1590759005_de5e1995.jpg" alt="milk tea">
+            <img src="https://down-id.img.susercontent.com/file/f074744474749f7e8a9f6a7d1a29339e" alt="Milk Tea">
             <h3>MILK TEA</h3>
-            <div class="price">B 50 / botol</div>
-            <input type="number" min="1" value="1" class="quantity" id="qty4">
-            <button onclick="tambahKeRekap(50, 'qty4')">Tambah</button>
+            <div class="price">B 55 / botol</div>
+            <input type="number" min="1" value="1" class="quantity" id="qty5">
+            <button onclick="tambahKeRekap(55, 'qty5')">Tambah</button>
         </div>
-        
     </div>
 
     <div class="rekap-section">
@@ -123,9 +97,7 @@
                     </tr>
                 </thead>
                 <tbody id="tabelRekap">
-                    <tr id="placeholderRow">
-                        <td colspan="4" class="empty-row">Belum ada pesanan masuk</td>
-                    </tr>
+                    <tr id="placeholderRow"><td colspan="4" class="empty-row">Belum ada pesanan masuk</td></tr>
                 </tbody>
             </table>
         </div>
@@ -140,66 +112,39 @@
         const tabelRekap = document.getElementById('tabelRekap');
         const placeholderRow = document.getElementById('placeholderRow');
 
-        // Update display nama saat mengetik
-        namaInput.addEventListener('input', function() {
-            displayNama.innerText = namaInput.value || "-";
-        });
+        namaInput.addEventListener('input', () => { displayNama.innerText = namaInput.value || "-"; });
 
         function tambahKeRekap(harga, qtyId) {
             const nama = namaInput.value.trim();
             const qtyInput = document.getElementById(qtyId);
             const qty = parseInt(qtyInput.value);
-            
-            // Mengambil nama produk dari judul H3 di dalam kartu yang sama
             const namaProduk = qtyInput.parentElement.querySelector('h3').innerText;
 
-            if (nama === "") {
-                alert("Masukkan Nama Pemesan dulu ya!");
-                return;
-            }
+            if (nama === "") { alert("Masukkan Nama Pemesan!"); return; }
+            if (qty <= 0) { alert("Jumlah minimal 1"); return; }
 
-            if (qty > 0) {
-                // Hapus baris "Belum ada pesanan" jika ini pesanan pertama
-                if (placeholderRow) {
-                    placeholderRow.style.display = 'none';
-                }
+            if (placeholderRow) placeholderRow.style.display = 'none';
 
-                // 1. Update Hitungan Global di Summary
-                globalTotalItem += qty;
-                globalTotalHarga += (harga * qty);
-                document.getElementById('totalItem').innerText = globalTotalItem;
-                document.getElementById('totalHarga').innerText = globalTotalHarga.toLocaleString();
+            globalTotalItem += qty;
+            globalTotalHarga += (harga * qty);
+            document.getElementById('totalItem').innerText = globalTotalItem;
+            document.getElementById('totalHarga').innerText = globalTotalHarga.toLocaleString();
 
-                // 2. Tambahkan Data ke Tabel Rekap
-                const row = tabelRekap.insertRow();
-                row.innerHTML = `
-                    <td style="font-weight: bold; color: #00ffff;">${nama}</td>
-                    <td>${namaProduk}</td>
-                    <td>${qty}</td>
-                    <td>B ${(harga * qty).toLocaleString()}</td>
-                `;
-
-                // Alert kecil agar user tahu sudah masuk
-                console.log(`Berhasil menambahkan ${namaProduk} untuk ${nama}`);
-            }
+            const row = tabelRekap.insertRow();
+            row.innerHTML = `
+                <td style="font-weight: bold; color: #00ffff;">${nama}</td>
+                <td>${namaProduk}</td>
+                <td>${qty}</td>
+                <td>B ${(harga * qty).toLocaleString()}</td>
+            `;
+            qtyInput.value = 1;
         }
 
         function resetPesanan() {
-            if (confirm("Yakin ingin menghapus semua daftar nama dan pesanan?")) {
-                globalTotalItem = 0;
-                globalTotalHarga = 0;
-                namaInput.value = "";
-                displayNama.innerText = "-";
-                document.getElementById('totalItem').innerText = "0";
-                document.getElementById('totalHarga').innerText = "0";
-                tabelRekap.innerHTML = `
-                    <tr id="placeholderRow">
-                        <td colspan="4" class="empty-row">Belum ada pesanan masuk</td>
-                    </tr>
-                `;
+            if (confirm("Hapus semua rekap?")) {
+                location.reload();
             }
         }
     </script>
 </body>
 </html>
-
