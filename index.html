@@ -52,8 +52,8 @@
 
     <div class="order-form">
         <input type="text" id="namaPemesan" placeholder="Ketik Nama Anda..." oninput="pantauPesananSaya()">
-        <select id="asalPemesan">
-            <option value="" disabled selected>-- Pilih Asal Pesanan --</option>
+        <select id="SITUS">
+            <option value="" disabled selected>-- SITUS --</option>
             <option value="LINETOGEL">LINETOGEL</option><option value="GENGTOTO">GENGTOTO</option>
             <option value="TOGELUP">TOGELUP</option><option value="GOL">GOL</option>
             <option value="DDT">DDT</option><option value="HOMETOGEL">HOMETOGEL</option>
@@ -127,7 +127,7 @@
                     const p = data[key];
                     listPublik.innerHTML += `
                         <div class="order-row">
-                            <div><b>${p.nama}</b><span class="origin-tag">📍 ${p.asal}</span></div>
+                            <div><b>${p.nama}</b><span class="origin-tag">📍 ${p.SITUS}</span></div>
                             <span>${p.produk} (x${p.jumlah})</span>
                         </div>`;
                 });
@@ -136,15 +136,15 @@
 
         function pesanSekarang(id, namaProduk, harga, stokTersedia) {
             const nama = document.getElementById('namaPemesan').value.trim();
-            const asal = document.getElementById('asalPemesan').value;
+            const SITUS = document.getElementById('SITUS').value;
             const qty = parseInt(document.getElementById('qty_' + id).value); // Mengambil nilai dari kolom qty
             
-            if (!nama || !asal) { alert("Isi Nama & Pilih Asal!"); return; }
+            if (!nama || !SITUS) { alert("Isi Nama & Pilih SITUS!"); return; }
             if (isNaN(qty) || qty < 1) { alert("Jumlah pesanan tidak valid!"); return; }
             
             database.ref('stok_produk/' + id).update({ stok: stokTersedia - qty });
             database.ref('pesanan/').push({ 
-                nama: nama, asal: asal, produk: namaProduk, jumlah: qty, 
+                nama: nama, SITUS: SITUS, produk: namaProduk, jumlah: qty, 
                 totalHarga: harga * qty, waktu: new Date().toLocaleTimeString() 
             });
             
@@ -153,5 +153,6 @@
     </script>
 </body>
 </html>
+
 
 
