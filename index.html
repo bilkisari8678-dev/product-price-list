@@ -3,80 +3,132 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Owen Caffe</title>
+    <title>Owen Caffe - Menu & Asal Pesanan</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     
     <style>
         body {
-            background: #0a0a0a;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                              url('https://img.freepik.com/foto-premium/hutan-tropis-yang-lebat-di-asia-tenggara_480416-50.jpg');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
+            margin: 0;
             color: white;
             font-family: 'Segoe UI', sans-serif;
-            padding: 20px;
-        }
-        h1 { color: #00ffff; text-align: center; text-shadow: 0 0 10px #00ffff; }
-        
-        .admin-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
-            background: #111;
-        }
-        
-        /* Header tabel berwarna Cyan sesuai gambar */
-        .admin-table th {
-            background: #00ffff;
-            color: black;
-            padding: 12px;
-            text-align: left;
-            text-transform: uppercase;
-            font-size: 14px;
-        }
-        
-        .admin-table td {
-            padding: 12px;
-            border-bottom: 1px solid #222;
-            font-size: 14px;
+            padding-bottom: 50px;
         }
 
-        /* Styling Nama Asal agar menonjol */
-        .origin-text {
-            color: #ffea00;
-            font-weight: bold;
-            display: block;
-            font-size: 12px;
+        .header { text-align: center; padding: 30px 20px; }
+        .header h1 { font-size: 2.5rem; color: #00ffff; text-shadow: 0 0 10px #00ffff; margin: 0; }
+
+        .order-form { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            gap: 12px; 
+            margin-bottom: 20px; 
+        }
+        
+        input[type="text"], select {
+            padding: 12px; width: 85%; max-width: 400px; border-radius: 25px;
+            border: 2px solid #00ffff; background: rgba(0, 0, 0, 0.7); color: white; 
+            text-align: center; outline: none; font-size: 16px;
         }
 
-        .btn-selesai {
-            background: #ff4444;
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
+        select option { background: #1a1a1a; color: white; }
+
+        .product-container { 
+            display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 20px 10px; 
+        }
+        
+        .product-card {
+            background: rgba(0, 0, 0, 0.8); border: 2px solid #00ffff; border-radius: 15px;
+            width: 220px; padding: 15px; text-align: center;
+            display: flex; flex-direction: column; justify-content: space-between;
         }
 
-        .btn-selesai:hover { background: #cc0000; }
+        .product-card img { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 10px; }
+        .product-card h3 { font-size: 16px; margin: 5px 0; color: #00ffff; }
+        .stok-info { font-size: 13px; color: #ffea00; margin-bottom: 10px; font-weight: bold; }
+        .price { font-weight: bold; color: #00ffff; margin-bottom: 15px; }
+
+        .order-box {
+            background: rgba(0, 255, 255, 0.1); border: 2px solid #00ffff;
+            border-radius: 15px; padding: 15px; margin: 20px auto; width: 90%; max-width: 600px; backdrop-filter: blur(10px);
+        }
+
+        .quantity {
+            width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #00ffff;
+            background: white; color: black; text-align: center; box-sizing: border-box; font-size: 16px; margin-bottom: 10px;
+        }
+
+        button {
+            background: #00ffff; color: black; border: none; padding: 12px;
+            border-radius: 8px; font-weight: bold; cursor: pointer; width: 100%; font-size: 16px;
+        }
+
+        button:disabled { background: #444 !important; color: #888 !important; cursor: not-allowed; }
+        
+        .order-row { 
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 0; border-bottom: 1px solid rgba(0, 255, 255, 0.2); font-size: 14px; 
+        }
+        .origin-tag { color: #ffea00; font-size: 11px; font-weight: bold; display: block; }
     </style>
 </head>
 <body>
 
-    <h1>🛠️ MONITORING PESANAN - ADMIN</h1>
+    <div class="header">
+        <h1>✨ OWEN CAFFE ✨</h1>
+    </div>
 
-    <table class="admin-table">
-        <thead>
-            <tr>
-                <th>Waktu</th>
-                <th>Pemesan & Asal</th> <th>Produk</th>
-                <th>Qty</th>
-                <th>Total</th>
-                <th>Aksi</th>
-            </tr>
-        </thead>
-        <tbody id="orderTableBody">
-            </tbody>
-    </table>
+    <div class="order-form">
+        <input type="text" id="namaPemesan" placeholder="Ketik Nama Anda..." oninput="pantauPesananSaya()">
+        
+        <select id="asalPemesan">
+            <option value="" disabled selected>-- Pilih Asal Pesanan --</option>
+            <option value="LINETOGEL">LINETOGEL</option><option value="GENGTOTO">GENGTOTO</option>
+            <option value="TOGELUP">TOGELUP</option><option value="GOL">GOL</option>
+            <option value="DDT">DDT</option><option value="HOMETOGEL">HOMETOGEL</option>
+            <option value="JONI">JONI</option><option value="UDIN">UDIN</option>
+            <option value="INDRABET">INDRABET</option><option value="INDRATOGEL">INDRATOGEL</option>
+            <option value="FIATOGEL">FIATOGEL</option><option value="PATIH TOTO">PATIH TOTO</option>
+            <option value="OPPA TOTO">OPPA TOTO</option><option value="TOGEL ON">TOGEL ON</option>
+            <option value="YOK TOGEL">YOK TOGEL</option><option value="YOWESTOGEL">YOWESTOGEL</option>
+            <option value="LUNA">LUNA</option><option value="PRO TOGEL">PRO TOGEL</option>
+            <option value="PWVIP4D">PWVIP4D</option><option value="MARIA TOGEL">MARIA TOGEL</option>
+            <option value="ZIATOGEL">ZIATOGEL</option><option value="DANATOTO">DANATOTO</option>
+            <option value="PARTAITOGEL">PARTAITOGEL</option><option value="SITUSTOTO">SITUSTOTO</option>
+            <option value="NANASTOTO">NANASTOTO</option><option value="WDBOS">WDBOS</option>
+            <option value="BosJoko">BosJoko</option><option value="JUTAWAN BET">JUTAWAN BET</option>
+            <option value="LATOTO">LATOTO</option><option value="MANCING DUIT">MANCING DUIT</option>
+            <option value="DEPOBOS">DEPOBOS</option><option value="TVTOTO">TVTOTO</option>
+            <option value="PULITOTO">PULITOTO</option><option value="WATITOTO">WATITOTO</option>
+            <option value="ANGKABET167">ANGKABET167</option><option value="FATCAI99">FATCAI99</option>
+            <option value="NAKBON99">NAKBON99</option><option value="UDOY88">UDOY88</option>
+            <option value="TOPANBOS88">TOPANBOS88</option><option value="MONGGOWIN88">MONGGOWIN88</option>
+            <option value="RUANGWD">RUANGWD</option><option value="TOPWD">TOPWD</option>
+            <option value="HOKIJITU">HOKIJITU</option><option value="BANDAR80">BANDAR80</option>
+            <option value="LAPAK99">LAPAK99</option><option value="JUARA88">JUARA88</option>
+            <option value="LIGABANDOT">LIGABANDOT</option>
+        </select>
+    </div>
+
+    <div class="order-box" id="boxPesananSaya" style="display: none;">
+        <h3 style="text-align:center; color:#00ffff; margin:0 0 10px 0;">🛒 PESANAN SAYA</h3>
+        <div id="daftarPesanan"></div>
+    </div>
+
+    <div class="product-container" id="menu-container"></div>
+
+    <div class="order-box">
+        <h3 style="text-align:center; color:#00ffff; margin:0 0 10px 0;">👥 ANTREAN PESANAN</h3>
+        <div id="listPemesanPublik">
+            <p style="text-align:center; font-style:italic; color:#888;">Belum ada antrean...</p>
+        </div>
+    </div>
 
     <script>
         const firebaseConfig = {
@@ -91,37 +143,82 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // Mendengarkan data pesanan secara real-time
-        database.ref('pesanan/').on('value', (snapshot) => {
+        // Muat Menu secara Real-time
+        database.ref('stok_produk/').on('value', (snapshot) => {
             const data = snapshot.val();
-            const tableBody = document.getElementById('orderTableBody');
-            tableBody.innerHTML = "";
-            
+            if (!data) return;
+            const container = document.getElementById('menu-container');
+            container.innerHTML = "";
+            Object.keys(data).forEach((id) => {
+                const item = data[id];
+                const isHabis = item.stok <= 0;
+                container.innerHTML += `
+                    <div class="product-card">
+                        <img src="${item.img}" alt="${item.nama}">
+                        <h3>${item.nama}</h3>
+                        <div class="stok-info">${isHabis ? '<span style="color:red">STOK HABIS</span>' : 'Tersedia: ' + item.stok}</div>
+                        <div class="price">B ${item.harga}</div>
+                        <input type="number" min="1" value="1" class="quantity" id="qty_${id}" ${isHabis ? 'disabled' : ''}>
+                        <button onclick="pesanSekarang('${id}', '${item.nama}', ${item.harga}, ${item.stok})" ${isHabis ? 'disabled' : ''}>
+                            ${isHabis ? 'CLOSE' : 'Tambah'}
+                        </button>
+                    </div>`;
+            });
+        });
+
+        // Muat List Antrean Publik
+        database.ref('pesanan/').limitToLast(10).on('value', (snapshot) => {
+            const data = snapshot.val();
+            const listPublik = document.getElementById('listPemesanPublik');
+            listPublik.innerHTML = "";
             if (data) {
                 Object.keys(data).reverse().forEach((key) => {
                     const p = data[key];
-                    tableBody.innerHTML += `
-                        <tr>
-                            <td>${p.waktu || '-'}</td>
-                            <td>
-                                <b>${p.nama}</b>
-                                <span class="origin-text">📍 ${p.asal || 'Tanpa Asal'}</span> </td>
-                            <td>${p.produk}</td>
-                            <td>${p.jumlah}</td>
-                            <td>B ${p.totalHarga}</td>
-                            <td><button class="btn-selesai" onclick="hapusPesanan('${key}')">Selesai</button></td>
-                        </tr>
-                    `;
+                    listPublik.innerHTML += `
+                        <div class="order-row">
+                            <div style="text-align:left">
+                                <span style="color:#00ffff; font-weight:bold;">${p.nama}</span>
+                                <span class="origin-tag">${p.asal}</span>
+                            </div>
+                            <span style="font-weight:bold">${p.produk} (x${p.jumlah})</span>
+                        </div>`;
                 });
-            } else {
-                tableBody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Belum ada pesanan masuk.</td></tr>';
             }
         });
 
-        function hapusPesanan(key) {
-            if(confirm("Tandai pesanan ini sebagai selesai?")) {
-                database.ref('pesanan/' + key).remove();
-            }
+        function pesanSekarang(id, namaProduk, harga, stokTersedia) {
+            const namaUser = document.getElementById('namaPemesan').value.trim();
+            const asalUser = document.getElementById('asalPemesan').value;
+            const qtyInput = document.getElementById('qty_' + id);
+            const qty = parseInt(qtyInput.value);
+
+            if (!namaUser || !asalUser) { alert("Harap isi Nama dan pilih Asal Pesanan!"); return; }
+            if (qty > stokTersedia) { alert("Maaf, stok hanya tersisa " + stokTersedia); return; }
+
+            database.ref('stok_produk/' + id).update({ stok: stokTersedia - qty });
+            database.ref('pesanan/').push({ 
+                nama: namaUser, asal: asalUser, produk: namaProduk, jumlah: qty, 
+                totalHarga: harga * qty, waktu: new Date().toLocaleTimeString() 
+            });
+            qtyInput.value = 1;
+        }
+
+        function pantauPesananSaya() {
+            const nama = document.getElementById('namaPemesan').value.trim();
+            const box = document.getElementById('boxPesananSaya');
+            const daftar = document.getElementById('daftarPesanan');
+            if (nama.length < 2) { box.style.display = 'none'; return; }
+            database.ref('pesanan/').orderByChild('nama').equalTo(nama).on('value', (snapshot) => {
+                const data = snapshot.val();
+                daftar.innerHTML = "";
+                if (data) {
+                    box.style.display = 'block';
+                    Object.keys(data).forEach((key) => {
+                        const item = data[key];
+                        daftar.innerHTML += `<div class="order-row"><span>${item.produk} (x${item.jumlah})</span><span>B ${item.totalHarga}</span></div>`;
+                    });
+                } else { box.style.display = 'none'; }
+            });
         }
     </script>
 </body>
