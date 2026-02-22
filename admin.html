@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Panel - Owen Caffe Grouping</title>
+    <title>Admin - Total Per Asal</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     
@@ -11,61 +11,52 @@
         body { background: #0a0a0a; color: white; font-family: 'Segoe UI', sans-serif; padding: 20px; }
         h1 { color: #00ffff; text-align: center; text-shadow: 0 0 10px #00ffff; }
         
-        /* Container untuk setiap grup pemesan */
-        .order-group {
+        .origin-group {
             background: rgba(255, 255, 255, 0.05);
             border: 2px solid #00ffff;
             border-radius: 12px;
             margin-bottom: 25px;
             overflow: hidden;
-            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.1);
         }
 
-        /* Header Grup (Nama & Asal) */
-        .group-header {
+        .origin-header {
             background: #00ffff;
             color: black;
             padding: 12px 20px;
+            font-weight: bold;
+            font-size: 1.2rem;
             display: flex;
             justify-content: space-between;
-            align-items: center;
         }
 
-        .name-box b { font-size: 1.2rem; text-transform: uppercase; }
-        .origin-label { display: block; font-size: 0.8rem; font-weight: bold; opacity: 0.8; }
-
-        /* Isi Pesanan */
-        .group-content { padding: 15px; }
-        .item-row {
+        .origin-content { padding: 15px; }
+        
+        .product-summary {
             display: flex;
             justify-content: space-between;
             padding: 8px 0;
-            border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+            font-size: 1.1rem;
         }
 
-        .group-footer {
-            background: rgba(0, 255, 255, 0.05);
-            padding: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-top: 1px dashed #00ffff;
+        .customer-list {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 10px;
+            font-style: italic;
         }
 
-        .total-amount { color: #00ffff; font-weight: bold; font-size: 1.2rem; }
-
-        .btn-finish {
+        .btn-clear {
             background: #ff4444; color: white; border: none; padding: 10px 20px;
-            border-radius: 6px; cursor: pointer; font-weight: bold;
+            border-radius: 6px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 10px;
         }
-        .btn-finish:hover { background: #cc0000; }
     </style>
 </head>
 <body>
 
-    <h1>📊 MONITORING GRUP PESANAN</h1>
-    <div id="displayArea">
-        <p style="text-align: center; color: #888;">Menunggu pesanan baru...</p>
+    <h1>📊 REKAP TOTAL PER ASAL (GOL, DLL)</h1>
+    <div id="originDisplay">
+        <p style="text-align: center; color: #888;">Menunggu data pesanan...</p>
     </div>
 
     <script>
@@ -83,66 +74,74 @@
 
         database.ref('pesanan/').on('value', (snapshot) => {
             const data = snapshot.val();
-            const displayArea = document.getElementById('displayArea');
-            displayArea.innerHTML = "";
+            const display = document.getElementById('originDisplay');
+            display.innerHTML = "";
             
             if (data) {
-                const groupedData = {};
+                const totalsByOrigin = {};
 
-                // Kelompokkan data berdasarkan Nama Pemesan
+                // Proses hitung total per asal
                 Object.keys(data).forEach((id) => {
                     const p = data[id];
-                    if (!groupedData[p.nama]) {
-                        groupedData[p.nama] = {
-                            asal: p.asal,
-                            items: [],
-                            grandTotal: 0,
-                            keys: []
+                    const asal = p.asal || "Tanpa Asal";
+                    
+                    if (!totalsByOrigin[asal]) {
+                        totalsByOrigin[asal] = {
+                            produk: {},
+                            pembeli: [],
+                            ids: []
                         };
                     }
-                    groupedData[p.nama].items.push({ nama: p.produk, qty: p.jumlah, sub: p.totalHarga });
-                    groupedData[p.nama].grandTotal += p.totalHarga;
-                    groupedData[p.nama].keys.push(id);
+
+                    // Tambahkan Qty produk
+                    if (!totalsByOrigin[asal].produk[p.produk]) {
+                        totalsByOrigin[asal].produk[p.produk] = 0;
+                    }
+                    totalsByOrigin[asal].produk[p.produk] += parseInt(p.jumlah);
+                    
+                    // Catat nama pembeli untuk referensi
+                    if (!totalsByOrigin[asal].pembeli.includes(p.nama)) {
+                        totalsByOrigin[asal].pembeli.push(p.nama);
+                    }
+                    totalsByOrigin[asal].ids.push(id);
                 });
 
-                // Render ke layar
-                Object.keys(groupedData).reverse().forEach((nama) => {
-                    const g = groupedData[nama];
-                    let listItems = "";
-                    g.items.forEach(item => {
-                        listItems += `
-                            <div class="item-row">
-                                <span>${item.nama} <b>(x${item.qty})</b></span>
-                                <span>B ${item.sub}</span>
+                // Tampilkan hasil
+                Object.keys(totalsByOrigin).forEach((asal) => {
+                    const group = totalsByOrigin[asal];
+                    let productHtml = "";
+                    
+                    for (const [namaProduk, totalQty] of Object.entries(group.produk)) {
+                        productHtml += `
+                            <div class="product-summary">
+                                <span>✅ ${namaProduk}</span>
+                                <b>TOTAL: ${totalQty}</b>
                             </div>`;
-                    });
+                    }
 
-                    displayArea.innerHTML += `
-                        <div class="order-group">
-                            <div class="group-header">
-                                <div class="name-box">
-                                    <b>${nama}</b>
-                                    <span class="origin-label">📍 ASAL: ${g.asal}</span>
-                                </div>
-                                <span>${g.items.length} Item</span>
+                    display.innerHTML += `
+                        <div class="origin-group">
+                            <div class="origin-header">
+                                <span>📍 ${asal}</span>
+                                <span>${group.pembeli.length} Orang</span>
                             </div>
-                            <div class="group-content">${listItems}</div>
-                            <div class="group-footer">
-                                <div>Total: <span class="total-amount">B ${g.grandTotal}</span></div>
-                                <button class="btn-finish" onclick="hapusGrup('${g.keys.join(',')}')">SELESAI</button>
+                            <div class="origin-content">
+                                ${productHtml}
+                                <div class="customer-list">Pembeli: ${group.pembeli.join(', ')}</div>
+                                <button class="btn-clear" onclick="hapusAsal('${group.ids.join(',')}')">HAPUS REKAP ${asal}</button>
                             </div>
                         </div>
                     `;
                 });
             } else {
-                displayArea.innerHTML = '<p style="text-align: center; color: #888;">Antrean kosong.</p>';
+                display.innerHTML = '<p style="text-align: center; color: #888;">Tidak ada pesanan masuk.</p>';
             }
         });
 
-        function hapusGrup(keysString) {
-            if(confirm("Hapus semua pesanan untuk nama ini?")) {
-                const keys = keysString.split(',');
-                keys.forEach(k => database.ref('pesanan/' + k).remove());
+        function hapusAsal(idsString) {
+            if(confirm("Hapus semua pesanan dari grup ini?")) {
+                const ids = idsString.split(',');
+                ids.forEach(id => database.ref('pesanan/' + id).remove());
             }
         }
     </script>
