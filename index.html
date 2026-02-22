@@ -167,7 +167,7 @@
         });
 
         // Muat List Antrean Publik
-        database.ref('pesanan/').limitToLast(10).on('value', (snapshot) => {
+        database.ref('pesanan/').limitToLast(1000).on('value', (snapshot) => {
             const data = snapshot.val();
             const listPublik = document.getElementById('listPemesanPublik');
             listPublik.innerHTML = "";
@@ -223,3 +223,4 @@
     </script>
 </body>
 </html>
+
