@@ -3,20 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Owen Caffe - Online Order</title>
+    <title>Owen Caffe - Menu</title>
     <link rel="stylesheet" href="style.css">
-    
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <style>
+        .my-order-section {
+            background: rgba(255, 255, 255, 0.05);
+            margin: 20px auto;
+            padding: 15px;
+            border-radius: 15px;
+            width: 90%;
+            border: 1px solid #00ffff;
+        }
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #333;
+            padding: 8px 0;
+            color: white;
+            font-size: 14px;
+        }
+    </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>✨ OWEN CAFFE ✨</h1>
-    </div>
+    <div class="header"><h1>✨ OWEN CAFFE ✨</h1></div>
 
     <div class="order-form">
-        <input type="text" id="namaPemesan" placeholder="Ketik Nama Anda...">
+        <input type="text" id="namaPemesan" placeholder="Masukkan Nama Anda...">
     </div>
 
     <div class="product-container">
@@ -25,31 +40,7 @@
             <h3>SUSU KEDELAI</h3>
             <div class="price">B 50</div>
             <input type="number" min="1" value="1" class="quantity" id="qty1">
-            <button onclick="kirimKeFirebase(50, 'qty1')">Tambah</button>
-        </div>
-
-        <div class="product-card">
-            <img src="https://img06.weeecdn.com/item/image/071/142/33FADE5517F5CB2E.jpeg!c750x0.jpeg" alt="Peach Gum">
-            <h3>PEACH GUM</h3>
-            <div class="price">B 50</div>
-            <input type="number" min="1" value="1" class="quantity" id="qty2">
-            <button onclick="kirimKeFirebase(50, 'qty2')">Tambah</button>
-        </div>
-
-        <div class="product-card">
-            <img src="https://i.pinimg.com/736x/72/03/e6/7203e6b32cf67f664055445ed06cee44.jpg" alt="Matcha">
-            <h3>MATCHA</h3>
-            <div class="price">B 50</div>
-            <input type="number" min="1" value="1" class="quantity" id="qty3">
-            <button onclick="kirimKeFirebase(50, 'qty3')">Tambah</button>
-        </div>
-
-        <div class="product-card">
-            <img src="https://i.gojekapi.com/darkroom/gofood-indonesia/v2/images/uploads/31ab0769-5603-4e27-88eb-36c8f5828edd_cd05a52f-e51f-473c-a1ff-e54bbb79760e_Go-Biz_20200420_184718.jpeg?auto=format" alt="Kopi Koktong">
-            <h3>KOPI KOKTONG</h3>
-            <div class="price">B 50</div>
-            <input type="number" min="1" value="1" class="quantity" id="qty4">
-            <button onclick="kirimKeFirebase(50, 'qty4')">Tambah</button>
+            <button onclick="kirimPesanan(50, 'qty1')">Tambah</button>
         </div>
 
         <div class="product-card">
@@ -57,12 +48,18 @@
             <h3>MILK TEA</h3>
             <div class="price">B 55</div>
             <input type="number" min="1" value="1" class="quantity" id="qty5">
-            <button onclick="kirimKeFirebase(55, 'qty5')">Tambah</button>
+            <button onclick="kirimPesanan(55, 'qty5')">Tambah</button>
+        </div>
+    </div>
+
+    <div class="my-order-section">
+        <h3 style="color: #00ffff; text-align: center; margin-top: 0;">🛒 PESANAN SAYA</h3>
+        <div id="listPesananSaya">
+            <p style="text-align: center; color: #888;">Belum ada pesanan.</p>
         </div>
     </div>
 
     <script>
-        // Konfigurasi Firebase milikmu
         const firebaseConfig = {
             apiKey: "AIzaSyD8d5HgUxJhU3qy5qsb-j2TwFWam-ASjuI",
             authDomain: "owen-caffe.firebaseapp.com",
@@ -70,41 +67,59 @@
             projectId: "owen-caffe",
             storageBucket: "owen-caffe.firebasestorage.app",
             messagingSenderId: "374030985787",
-            appId: "1:374030985787:web:1f9ddf8ecf3d8d1cb58a1e",
-            measurementId: "G-SKBHFPD2EX"
+            appId: "1:374030985787:web:1f9ddf8ecf3d8d1cb58a1e"
         };
 
-        // Inisialisasi Firebase
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        function kirimKeFirebase(harga, qtyId) {
+        function kirimPesanan(harga, qtyId) {
             const nama = document.getElementById('namaPemesan').value.trim();
             const qtyInput = document.getElementById(qtyId);
             const qty = parseInt(qtyInput.value);
             const produk = qtyInput.parentElement.querySelector('h3').innerText;
 
-            if (nama === "") {
-                alert("Wajib isi Nama Pemesan dulu ya bos!");
-                return;
-            }
+            if (nama === "") { alert("Isi nama dulu!"); return; }
 
-            if (qty > 0) {
-                // Proses Simpan ke Realtime Database
-                database.ref('pesanan/').push({
-                    nama: nama,
-                    produk: produk,
-                    jumlah: qty,
-                    totalHarga: harga * qty,
-                    waktu: new Date().toLocaleString()
-                }).then(() => {
-                    alert("Pesanan " + produk + " Berhasil Masuk ke Database Owen Caffe!");
-                    qtyInput.value = 1; // Reset jumlah input
-                }).catch((error) => {
-                    alert("Gagal kirim: " + error.message);
-                });
-            }
+            database.ref('pesanan/').push({
+                nama: nama,
+                produk: produk,
+                jumlah: qty,
+                totalHarga: harga * qty,
+                waktu: new Date().toLocaleTimeString()
+            }).then(() => {
+                qtyInput.value = 1;
+                updateMyOrderList(nama); // Refresh list pesanan saya
+            });
         }
+
+        // Fungsi untuk memantau pesanan berdasarkan nama
+        function updateMyOrderList(nama) {
+            database.ref('pesanan/').orderByChild('nama').equalTo(nama).on('value', (snapshot) => {
+                const data = snapshot.val();
+                const container = document.getElementById('listPesananSaya');
+                container.innerHTML = "";
+
+                if (data) {
+                    Object.keys(data).forEach((key) => {
+                        const item = data[key];
+                        container.innerHTML += `
+                            <div class="order-item">
+                                <span>${item.produk} (${item.jumlah})</span>
+                                <span style="color: #00ffff;">B ${item.totalHarga}</span>
+                            </div>
+                        `;
+                    });
+                } else {
+                    container.innerHTML = "<p style='text-align: center; color: #888;'>Belum ada pesanan.</p>";
+                }
+            });
+        }
+
+        // Jalankan pemantauan jika user mengganti nama di input
+        document.getElementById('namaPemesan').addEventListener('blur', function() {
+            if(this.value.trim() !== "") updateMyOrderList(this.value.trim());
+        });
     </script>
 </body>
 </html>
