@@ -3,26 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Owen Caffe - Menu</title>
+    <title>Owen Caffe - Order Menu</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
-        .my-order-section {
-            background: rgba(255, 255, 255, 0.05);
-            margin: 20px auto;
-            padding: 15px;
+        .user-order-list {
+            background: rgba(0, 255, 255, 0.05);
+            border: 2px solid #00ffff;
             border-radius: 15px;
+            padding: 15px;
+            margin: 20px auto;
             width: 90%;
-            border: 1px solid #00ffff;
+            max-width: 500px;
+            color: white;
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
         }
-        .order-item {
+        .order-row {
             display: flex;
             justify-content: space-between;
-            border-bottom: 1px solid #333;
             padding: 8px 0;
-            color: white;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             font-size: 14px;
+        }
+        .total-info {
+            text-align: right;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #00ffff;
+            font-size: 16px;
         }
     </style>
 </head>
@@ -31,7 +40,13 @@
     <div class="header"><h1>✨ OWEN CAFFE ✨</h1></div>
 
     <div class="order-form">
-        <input type="text" id="namaPemesan" placeholder="Masukkan Nama Anda...">
+        <input type="text" id="namaPemesan" placeholder="Ketik Nama Anda untuk Pesan..." oninput="pantauPesananSaya()">
+    </div>
+
+    <div class="user-order-list" id="boxPesananSaya" style="display: none;">
+        <h3 style="margin-top: 0; color: #00ffff; text-align: center;">🛒 PESANAN SAYA</h3>
+        <div id="daftarPesanan"></div>
+        <div class="total-info" id="totalBayarSaya"></div>
     </div>
 
     <div class="product-container">
@@ -44,22 +59,40 @@
         </div>
 
         <div class="product-card">
+            <img src="https://img06.weeecdn.com/item/image/071/142/33FADE5517F5CB2E.jpeg!c750x0.jpeg" alt="Peach Gum">
+            <h3>PEACH GUM</h3>
+            <div class="price">B 50</div>
+            <input type="number" min="1" value="1" class="quantity" id="qty2">
+            <button onclick="kirimPesanan(50, 'qty2')">Tambah</button>
+        </div>
+
+        <div class="product-card">
+            <img src="https://i.pinimg.com/736x/72/03/e6/7203e6b32cf67f664055445ed06cee44.jpg" alt="Matcha">
+            <h3>MATCHA</h3>
+            <div class="price">B 50</div>
+            <input type="number" min="1" value="1" class="quantity" id="qty3">
+            <button onclick="kirimPesanan(50, 'qty3')">Tambah</button>
+        </div>
+
+        <div class="product-card">
+            <img src="https://i.gojekapi.com/darkroom/gofood-indonesia/v2/images/uploads/31ab0769-5603-4e27-88eb-36c8f5828edd_cd05a52f-e51f-473c-a1ff-e54bbb79760e_Go-Biz_20200420_184718.jpeg?auto=format" alt="Kopi Koktong">
+            <h3>KOPI KOKTONG</h3>
+            <div class="price">B 50</div>
+            <input type="number" min="1" value="1" class="quantity" id="qty4">
+            <button onclick="kirimPesanan(50, 'qty4')">Tambah</button>
+        </div>
+
+        <div class="product-card">
             <img src="https://down-id.img.susercontent.com/file/f074744474749f7e8a9f6a7d1a29339e" alt="Milk Tea">
             <h3>MILK TEA</h3>
-            <div class="price">B 55</div>
+            <div class="price">B 50</div>
             <input type="number" min="1" value="1" class="quantity" id="qty5">
-            <button onclick="kirimPesanan(55, 'qty5')">Tambah</button>
-        </div>
-    </div>
-
-    <div class="my-order-section">
-        <h3 style="color: #00ffff; text-align: center; margin-top: 0;">🛒 PESANAN SAYA</h3>
-        <div id="listPesananSaya">
-            <p style="text-align: center; color: #888;">Belum ada pesanan.</p>
+            <button onclick="kirimPesanan(50, 'qty5')">Tambah</button>
         </div>
     </div>
 
     <script>
+        // Konfigurasi Firebase kamu
         const firebaseConfig = {
             apiKey: "AIzaSyD8d5HgUxJhU3qy5qsb-j2TwFWam-ASjuI",
             authDomain: "owen-caffe.firebaseapp.com",
@@ -79,8 +112,9 @@
             const qty = parseInt(qtyInput.value);
             const produk = qtyInput.parentElement.querySelector('h3').innerText;
 
-            if (nama === "") { alert("Isi nama dulu!"); return; }
+            if (nama === "") { alert("Mohon isi nama anda terlebih dahulu!"); return; }
 
+            // Mengirim data ke database
             database.ref('pesanan/').push({
                 nama: nama,
                 produk: produk,
@@ -89,37 +123,45 @@
                 waktu: new Date().toLocaleTimeString()
             }).then(() => {
                 qtyInput.value = 1;
-                updateMyOrderList(nama); // Refresh list pesanan saya
+                pantauPesananSaya(); 
             });
         }
 
-        // Fungsi untuk memantau pesanan berdasarkan nama
-        function updateMyOrderList(nama) {
+        // Menampilkan list pesanan khusus untuk nama yang sedang mengetik
+        function pantauPesananSaya() {
+            const nama = document.getElementById('namaPemesan').value.trim();
+            const box = document.getElementById('boxPesananSaya');
+            const daftar = document.getElementById('daftarPesanan');
+            const totalInfo = document.getElementById('totalBayarSaya');
+
+            if (nama.length < 2) {
+                box.style.display = 'none';
+                return;
+            }
+
             database.ref('pesanan/').orderByChild('nama').equalTo(nama).on('value', (snapshot) => {
                 const data = snapshot.val();
-                const container = document.getElementById('listPesananSaya');
-                container.innerHTML = "";
+                daftar.innerHTML = "";
+                let totalSemua = 0;
 
                 if (data) {
+                    box.style.display = 'block';
                     Object.keys(data).forEach((key) => {
                         const item = data[key];
-                        container.innerHTML += `
-                            <div class="order-item">
-                                <span>${item.produk} (${item.jumlah})</span>
-                                <span style="color: #00ffff;">B ${item.totalHarga}</span>
+                        totalSemua += item.totalHarga;
+                        daftar.innerHTML += `
+                            <div class="order-row">
+                                <span>${item.produk} (x${item.jumlah})</span>
+                                <span>B ${item.totalHarga.toLocaleString()}</span>
                             </div>
                         `;
                     });
+                    totalInfo.innerText = "Total Tagihan: B " + totalSemua.toLocaleString();
                 } else {
-                    container.innerHTML = "<p style='text-align: center; color: #888;'>Belum ada pesanan.</p>";
+                    box.style.display = 'none';
                 }
             });
         }
-
-        // Jalankan pemantauan jika user mengganti nama di input
-        document.getElementById('namaPemesan').addEventListener('blur', function() {
-            if(this.value.trim() !== "") updateMyOrderList(this.value.trim());
-        });
     </script>
 </body>
 </html>
