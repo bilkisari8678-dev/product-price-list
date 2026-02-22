@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Owen Caffe</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    <style>
+        .admin-table { width: 95%; margin: 20px auto; border-collapse: collapse; background: #1a1a1a; color: white; border-radius: 10px; overflow: hidden; }
+        .admin-table th { background: #00ffff; color: black; padding: 15px; text-align: left; }
+        .admin-table td { padding: 12px; border-bottom: 1px solid #333; }
+        .btn-hapus { background: #ff4444; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <div class="header"><h1>📊 REKAP PESANAN MASUK</h1></div>
+    
+    <div style="text-align: center; margin-bottom: 20px;">
+        <button class="reset-btn" onclick="hapusSemua()">Bersihkan Semua Pesanan</button>
+    </div>
+
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Waktu</th>
+                <th>Nama</th>
+                <th>Produk</th>
+                <th>Qty</th>
+                <th>Total</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody id="tabelAdmin">
+            </tbody>
+    </table>
+
+    <script>
+        // Gunakan Config yang sama dengan index.html
+        const firebaseConfig = {
+            apiKey: "AIzaSyD8d5HgUxJhU3qy5qsb-j2TwFWam-ASjuI",
+            authDomain: "owen-caffe.firebaseapp.com",
+            databaseURL: "https://owen-caffe-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "owen-caffe",
+            storageBucket: "owen-caffe.firebasestorage.app",
+            messagingSenderId: "374030985787",
+            appId: "1:374030985787:web:1f9ddf8ecf3d8d1cb58a1e"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Mengambil data secara realtime
+        database.ref('pesanan/').on('value', (snapshot) => {
+            const data = snapshot.val();
+            const tabel = document.getElementById('tabelAdmin');
+            tabel.innerHTML = ""; // Bersihkan tabel sebelum update
+
+            if (data) {
+                Object.keys(data).forEach((key) => {
+                    const item = data[key];
+                    const row = `<tr>
+                        <td>${item.waktu}</td>
+                        <td><strong>${item.nama}</strong></td>
+                        <td>${item.produk}</td>
+                        <td>${item.jumlah}</td>
+                        <td>B ${item.totalHarga}</td>
+                        <td><button class="btn-hapus" onclick="hapusSatu('${key}')">Selesai</button></td>
+                    </tr>`;
+                    tabel.innerHTML += row;
+                });
+            } else {
+                tabel.innerHTML = "<tr><td colspan='6' style='text-align:center;'>Belum ada pesanan masuk</td></tr>";
+            }
+        });
+
+        function hapusSatu(id) {
+            if(confirm("Tandai pesanan ini sudah selesai?")) {
+                database.ref('pesanan/' + id).remove();
+            }
+        }
+
+        function hapusSemua() {
+            if(confirm("Hapus semua rekap pesanan?")) {
+                database.ref('pesanan/').remove();
+            }
+        }
+    </script>
+</body>
+</html>
