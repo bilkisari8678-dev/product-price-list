@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Owen Caffe - Order Now</title>
+    <title>Owen Caffe - Order Now (Unlimited)</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     
@@ -34,10 +34,7 @@
             width: 220px; padding: 15px; text-align: center;
         }
         .product-card img { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; }
-        .stok-info { font-size: 0.85rem; margin: 10px 0; font-weight: bold; }
-        .tersedia { color: #ffea00; }
-        .habis { color: #ff0000; }
-        .price { font-weight: bold; color: #00ffff; margin: 10px 0; font-size: 1.1rem; }
+        .price { font-weight: bold; color: #00ffff; margin: 15px 0; font-size: 1.3rem; }
         
         /* Kolom Qty */
         .qty-input {
@@ -51,7 +48,6 @@
             border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer; 
             text-transform: uppercase;
         }
-        button:disabled { background: #555; color: #888; cursor: not-allowed; }
 
         /* Antrean Pesanan */
         .order-box {
@@ -121,7 +117,7 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // Ambil Data Produk & Stok
+        // Menampilkan Menu Tanpa Batasan Stok
         database.ref('stok_produk/').on('value', (snapshot) => {
             const data = snapshot.val();
             const container = document.getElementById('menu-container');
@@ -129,25 +125,19 @@
             if(data) {
                 Object.keys(data).forEach((id) => {
                     const item = data[id];
-                    const isHabis = item.stok <= 0;
                     container.innerHTML += `
                         <div class="product-card">
                             <img src="${item.img}" alt="${item.nama}">
                             <h3>${item.nama}</h3>
-                            <div class="stok-info ${isHabis ? 'habis' : 'tersedia'}">
-                                ${isHabis ? 'STOK HABIS' : 'Tersedia: ' + item.stok}
-                            </div>
                             <div class="price">B ${item.harga}</div>
-                            <input type="number" id="qty_${id}" class="qty-input" value="1" min="1" ${isHabis ? 'disabled' : ''}>
-                            <button ${isHabis ? 'disabled' : ''} onclick="pesanSekarang('${id}', '${item.nama}', ${item.harga}, ${item.stok})">
-                                ${isHabis ? 'CLOSE' : 'Tambah'}
-                            </button>
+                            <input type="number" id="qty_${id}" class="qty-input" value="1" min="1">
+                            <button onclick="pesanSekarang('${id}', '${item.nama}', ${item.harga})">Tambah</button>
                         </div>`;
                 });
             }
         });
 
-        // Ambil Data Antrean
+        // Tampilkan Antrean Pesanan
         database.ref('pesanan/').limitToLast(10).on('value', (snapshot) => {
             const data = snapshot.val();
             const listPublik = document.getElementById('listPemesanPublik');
@@ -167,20 +157,19 @@
             }
         });
 
-        // Fungsi Pesan dengan Validasi Wajib Isi
-        function pesanSekarang(id, namaProduk, harga, stokTersedia) {
+        // Fungsi Pesan Unlimited
+        function pesanSekarang(id, namaProduk, harga) {
             const nama = document.getElementById('namaPemesan').value.trim();
             const SITUS = document.getElementById('SITUS').value;
-            const qty = parseInt(document.getElementById('qty_' + id).value);
+            const qtyInput = document.getElementById('qty_' + id);
+            const qty = parseInt(qtyInput.value);
             
             // Validasi Nama & Situs
             if (!nama) { alert("⚠️ NAMA WAJIB DIISI!"); return; }
             if (!SITUS) { alert("⚠️ PILIH SITUS ANDA!"); return; }
             if (isNaN(qty) || qty < 1) { alert("⚠️ JUMLAH MINIMAL 1!"); return; }
-            if (qty > stokTersedia) { alert("⚠️ STOK TIDAK CUKUP!"); return; }
             
-            // Update Stok & Kirim Pesanan
-            database.ref('stok_produk/' + id).update({ stok: stokTersedia - qty });
+            // Langsung Kirim Pesanan Tanpa Mengurangi Stok
             database.ref('pesanan/').push({ 
                 nama: nama, 
                 SITUS: SITUS, 
@@ -190,11 +179,9 @@
                 waktu: new Date().toLocaleTimeString() 
             });
             
-            alert("Pesanan " + namaProduk + " berhasil ditambahkan!");
-            document.getElementById('qty_' + id).value = 1; 
+            alert("Pesanan " + namaProduk + " (" + qty + ") berhasil ditambahkan!");
+            qtyInput.value = 1; 
         }
     </script>
 </body>
 </html>
-
-
