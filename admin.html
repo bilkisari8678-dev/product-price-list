@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Recap - Zen Owen Caffe</title>
+    <title>Admin Recap - Grid Owen Caffe</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     
@@ -14,8 +14,8 @@
             min-height: 100vh;
             font-family: 'Segoe UI', sans-serif;
             color: white;
-            /* Menggunakan link GIF Koi Biru pilihan Anda */
-            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+            /* Background Koi Biru Pilihan */
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), 
                         url('https://i.pinimg.com/originals/3f/44/e1/3f44e122cfc5609777dba1331525c078.gif');
             background-size: cover;
             background-attachment: fixed;
@@ -27,87 +27,90 @@
             text-align: center; 
             text-shadow: 0 0 20px #00ffff; 
             text-transform: uppercase;
-            margin-bottom: 30px;
-            font-size: 2rem;
+            margin-bottom: 40px;
         }
 
+        /* Container Grid untuk 3 Kolom Ke Samping */
         #originDisplay { 
-            max-width: 600px; 
-            margin: 0 auto; 
+            display: grid;
+            grid-template-columns: repeat(3, 1fr); /* 3 Kolom sama besar */
+            gap: 20px; /* Jarak antar kartu */
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
-        /* Desain Kartu Rekap Sesuai Gambar Referensi */
+        /* Responsif: Menjadi 1 kolom di HP */
+        @media (max-width: 900px) {
+            #originDisplay { grid-template-columns: repeat(1, 1fr); }
+        }
+
+        /* Desain Kartu Rekap Sesuai Referensi */
         .origin-group {
             background: rgba(0, 0, 0, 0.85);
             border: 2px solid #00ffff;
-            border-radius: 15px;
-            margin-bottom: 25px;
+            border-radius: 12px;
             overflow: hidden;
-            box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
             backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
         }
 
         .origin-header {
             background: #00ffff;
             color: black;
-            padding: 12px 20px;
+            padding: 10px 15px;
             font-weight: bold;
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            font-size: 1.1rem;
+            font-size: 0.95rem;
         }
 
-        .origin-content { padding: 15px; }
+        .origin-content { padding: 15px; flex-grow: 1; }
         
         .product-summary {
             display: flex;
             justify-content: space-between;
-            padding: 12px 0;
+            padding: 8px 0;
             border-bottom: 1px solid rgba(0, 255, 255, 0.2);
-            font-size: 1.1rem;
+            font-size: 0.9rem;
         }
 
         .product-summary span { color: #00ffff; font-weight: bold; }
 
-        /* List pembeli sesuai referensi gambar */
         .customer-list {
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             color: #ffea00;
-            margin: 15px 0;
-            padding: 10px;
+            margin: 12px 0;
+            padding: 8px;
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            border-left: 4px solid #ffea00;
+            border-radius: 6px;
+            border-left: 3px solid #ffea00;
         }
 
         .btn-clear {
             background: #ff4d4d; 
             color: white; 
             border: none; 
-            padding: 14px;
-            border-radius: 10px; 
+            padding: 10px;
+            border-radius: 8px; 
             cursor: pointer; 
             font-weight: bold; 
             width: 100%; 
             text-transform: uppercase;
+            font-size: 0.85rem;
             transition: 0.3s;
         }
 
-        .btn-clear:hover { 
-            background: #ff1a1a; 
-            box-shadow: 0 0 15px #ff4d4d;
-            transform: scale(1.02);
-        }
+        .btn-clear:hover { background: #ff1a1a; box-shadow: 0 0 10px #ff4d4d; }
     </style>
 </head>
 <body>
 
-    <h1>📊 REKAP TOTAL PER ASAL</h1>
+    <h1>📊 REKAP PESANAN OWEN CAFFE</h1>
     
     <div id="originDisplay">
-        <p style="text-align: center; color: #888;">Menunggu data dari kolam Owen Caffe...</p>
-    </div>
+        </div>
 
     <script>
         const firebaseConfig = {
@@ -171,12 +174,12 @@
                         </div>`;
                 });
             } else {
-                display.innerHTML = '<p style="text-align: center; color: #888; background: rgba(0,0,0,0.5); padding: 20px; border-radius: 10px;">Antrean kosong. Ikan koi sedang berenang tenang...</p>';
+                display.innerHTML = '<div style="grid-column: span 3; text-align: center; color: #888;">Antrean kosong.</div>';
             }
         });
 
         function hapusAsal(idsString, asal) {
-            if(confirm("Hapus semua rekap untuk asal " + asal + "?")) {
+            if(confirm("Hapus rekap asal " + asal + "?")) {
                 const ids = idsString.split(',');
                 ids.forEach(id => database.ref('pesanan/' + id).remove());
             }
