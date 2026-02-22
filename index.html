@@ -8,6 +8,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     <style>
+        /* Styling Kotak List Pesanan Pelanggan */
         .user-order-list {
             background: rgba(0, 255, 255, 0.05);
             border: 2px solid #00ffff;
@@ -15,36 +16,39 @@
             padding: 15px;
             margin: 20px auto;
             width: 90%;
-            max-width: 500px;
+            max-width: 600px;
             color: white;
-            box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
         }
         .order-row {
             display: flex;
             justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 14px;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+            font-size: 15px;
         }
         .total-info {
             text-align: right;
-            margin-top: 10px;
+            margin-top: 15px;
             font-weight: bold;
             color: #00ffff;
-            font-size: 16px;
+            font-size: 18px;
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
         }
     </style>
 </head>
 <body>
 
-    <div class="header"><h1>✨ OWEN CAFFE ✨</h1></div>
+    <div class="header">
+        <h1>✨ OWEN CAFFE ✨</h1>
+    </div>
 
     <div class="order-form">
         <input type="text" id="namaPemesan" placeholder="Ketik Nama Anda untuk Pesan..." oninput="pantauPesananSaya()">
     </div>
 
     <div class="user-order-list" id="boxPesananSaya" style="display: none;">
-        <h3 style="margin-top: 0; color: #00ffff; text-align: center;">🛒 PESANAN SAYA</h3>
+        <h3 style="margin-top: 0; color: #00ffff; text-align: center; letter-spacing: 2px;">🛒 PESANAN SAYA</h3>
         <div id="daftarPesanan"></div>
         <div class="total-info" id="totalBayarSaya"></div>
     </div>
@@ -83,7 +87,7 @@
         </div>
 
         <div class="product-card">
-            <img src="https://img.freepik.com/premium-photo/thai-milk-tea-plastic-bottle-isolated-white-background_1339-159261.jpg?w=360" alt="Milk Tea">
+            <img src="https://img-global.cpcdn.com/recipes/d905d7c13a69f100/680x781cq80/thai-tea-foto-resep-utama.jpg" alt="Milk Tea">
             <h3>MILK TEA</h3>
             <div class="price">B 50</div>
             <input type="number" min="1" value="1" class="quantity" id="qty5">
@@ -92,7 +96,7 @@
     </div>
 
     <script>
-        // Konfigurasi Firebase kamu
+        // Config Firebase milik Owen Caffe
         const firebaseConfig = {
             apiKey: "AIzaSyD8d5HgUxJhU3qy5qsb-j2TwFWam-ASjuI",
             authDomain: "owen-caffe.firebaseapp.com",
@@ -112,9 +116,12 @@
             const qty = parseInt(qtyInput.value);
             const produk = qtyInput.parentElement.querySelector('h3').innerText;
 
-            if (nama === "") { alert("Mohon isi nama anda terlebih dahulu!"); return; }
+            if (nama === "") { 
+                alert("Mohon isi nama anda terlebih dahulu!"); 
+                return; 
+            }
 
-            // Mengirim data ke database
+            // Simpan ke Realtime Database
             database.ref('pesanan/').push({
                 nama: nama,
                 produk: produk,
@@ -127,7 +134,7 @@
             });
         }
 
-        // Menampilkan list pesanan khusus untuk nama yang sedang mengetik
+        // Fungsi menampilkan list pesanan khusus nama pelanggan tersebut
         function pantauPesananSaya() {
             const nama = document.getElementById('namaPemesan').value.trim();
             const box = document.getElementById('boxPesananSaya');
@@ -152,7 +159,7 @@
                         daftar.innerHTML += `
                             <div class="order-row">
                                 <span>${item.produk} (x${item.jumlah})</span>
-                                <span>B ${item.totalHarga.toLocaleString()}</span>
+                                <span style="color: #00ffff;">B ${item.totalHarga.toLocaleString()}</span>
                             </div>
                         `;
                     });
@@ -165,4 +172,3 @@
     </script>
 </body>
 </html>
-
