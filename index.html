@@ -1,1 +1,157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owen Caffe - Menu dengan Qty</title>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    
+    <style>
+        body {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                              url('https://img.freepik.com/foto-premium/hutan-tropis-yang-lebat-di-asia-tenggara_480416-50.jpg');
+            background-size: cover; background-attachment: fixed; background-position: center;
+            margin: 0; color: white; font-family: 'Segoe UI', sans-serif; padding-bottom: 50px;
+        }
+        .header { text-align: center; padding: 30px 20px; }
+        .header h1 { font-size: 2.5rem; color: #00ffff; text-shadow: 0 0 10px #00ffff; margin: 0; }
+        .order-form { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 20px; }
+        input[type="text"], select {
+            padding: 12px; width: 85%; max-width: 400px; border-radius: 25px;
+            border: 2px solid #00ffff; background: rgba(0, 0, 0, 0.7); color: white; 
+            text-align: center; outline: none; font-size: 16px;
+        }
+        .product-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 20px; padding: 20px 10px; }
+        .product-card {
+            background: rgba(0, 0, 0, 0.8); border: 2px solid #00ffff; border-radius: 15px;
+            width: 220px; padding: 15px; text-align: center;
+        }
+        .product-card img { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; }
+        .price { font-weight: bold; color: #00ffff; margin: 15px 0 10px 0; font-size: 1.1rem; }
+        
+        /* Gaya Kolom Tambah Pesanan (Qty) */
+        .qty-input {
+            width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #00ffff;
+            background: white; color: black; text-align: center; box-sizing: border-box; 
+            font-size: 16px; margin-bottom: 10px; font-weight: bold;
+        }
+
+        .order-box {
+            background: rgba(0, 255, 255, 0.1); border: 2px solid #00ffff;
+            border-radius: 15px; padding: 15px; margin: 20px auto; width: 90%; max-width: 600px; backdrop-filter: blur(10px);
+        }
+        button { background: #00ffff; color: black; border: none; padding: 12px; border-radius: 8px; font-weight: bold; width: 100%; cursor: pointer; }
+        .order-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid rgba(0, 255, 255, 0.2); }
+        .origin-tag { color: #ffea00; font-size: 11px; font-weight: bold; display: block; }
+    </style>
+</head>
+<body>
+
+    <div class="header"><h1>✨ OWEN CAFFE ✨</h1></div>
+
+    <div class="order-form">
+        <input type="text" id="namaPemesan" placeholder="Ketik Nama Anda..." oninput="pantauPesananSaya()">
+        <select id="asalPemesan">
+            <option value="" disabled selected>-- Pilih Asal Pesanan --</option>
+            <option value="LINETOGEL">LINETOGEL</option><option value="GENGTOTO">GENGTOTO</option>
+            <option value="TOGELUP">TOGELUP</option><option value="GOL">GOL</option>
+            <option value="DDT">DDT</option><option value="HOMETOGEL">HOMETOGEL</option>
+            <option value="JONI">JONI</option><option value="UDIN">UDIN</option>
+            <option value="INDRABET">INDRABET</option><option value="INDRATOGEL">INDRATOGEL</option>
+            <option value="FIATOGEL">FIATOGEL</option><option value="PATIH TOTO">PATIH TOTO</option>
+            <option value="OPPA TOTO">OPPA TOTO</option><option value="TOGEL ON">TOGEL ON</option>
+            <option value="YOK TOGEL">YOK TOGEL</option><option value="YOWESTOGEL">YOWESTOGEL</option>
+            <option value="LUNA">LUNA</option><option value="PRO TOGEL">PRO TOGEL</option>
+            <option value="PWVIP4D">PWVIP4D</option><option value="MARIA TOGEL">MARIA TOGEL</option>
+            <option value="ZIATOGEL">ZIATOGEL</option><option value="DANATOTO">DANATOTO</option>
+            <option value="PARTAITOGEL">PARTAITOGEL</option><option value="SITUSTOTO">SITUSTOTO</option>
+            <option value="NANASTOTO">NANASTOTO</option><option value="WDBOS">WDBOS</option>
+            <option value="BosJoko">BosJoko</option><option value="JUTAWAN BET">JUTAWAN BET</option>
+            <option value="LATOTO">LATOTO</option><option value="MANCING DUIT">MANCING DUIT</option>
+            <option value="DEPOBOS">DEPOBOS</option><option value="TVTOTO">TVTOTO</option>
+            <option value="PULITOTO">PULITOTO</option><option value="WATITOTO">WATITOTO</option>
+            <option value="ANGKABET167">ANGKABET167</option><option value="FATCAI99">FATCAI99</option>
+            <option value="NAKBON99">NAKBON99</option><option value="UDOY88">UDOY88</option>
+            <option value="TOPANBOS88">TOPANBOS88</option><option value="MONGGOWIN88">MONGGOWIN88</option>
+            <option value="RUANGWD">RUANGWD</option><option value="TOPWD">TOPWD</option>
+            <option value="HOKIJITU">HOKIJITU</option><option value="BANDAR80">BANDAR80</option>
+            <option value="LAPAK99">LAPAK99</option><option value="JUARA88">JUARA88</option>
+            <option value="LIGABANDOT">LIGABANDOT</option>
+        </select>
+    </div>
+
+    <div class="product-container" id="menu-container"></div>
+
+    <div class="order-box">
+        <h3 style="text-align:center; color:#00ffff;">👥 ANTREAN PESANAN</h3>
+        <div id="listPemesanPublik"></div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyD8d5HgUxJhU3qy5qsb-j2TwFWam-ASjuI",
+            authDomain: "owen-caffe.firebaseapp.com",
+            databaseURL: "https://owen-caffe-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "owen-caffe",
+            storageBucket: "owen-caffe.firebasestorage.app",
+            appId: "1:374030985787:web:1f9ddf8ecf3d8d1cb58a1e"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        database.ref('stok_produk/').on('value', (snapshot) => {
+            const data = snapshot.val();
+            const container = document.getElementById('menu-container');
+            container.innerHTML = "";
+            Object.keys(data).forEach((id) => {
+                const item = data[id];
+                container.innerHTML += `
+                    <div class="product-card">
+                        <img src="${item.img}" alt="${item.nama}">
+                        <h3>${item.nama}</h3>
+                        <div class="price">B ${item.harga}</div>
+                        <input type="number" id="qty_${id}" class="qty-input" value="1" min="1">
+                        <button onclick="pesanSekarang('${id}', '${item.nama}', ${item.harga}, ${item.stok})">Tambah</button>
+                    </div>`;
+            });
+        });
+
+        database.ref('pesanan/').limitToLast(10).on('value', (snapshot) => {
+            const data = snapshot.val();
+            const listPublik = document.getElementById('listPemesanPublik');
+            listPublik.innerHTML = data ? "" : "<p>Belum ada pesanan.</p>";
+            if (data) {
+                Object.keys(data).reverse().forEach((key) => {
+                    const p = data[key];
+                    listPublik.innerHTML += `
+                        <div class="order-row">
+                            <div><b>${p.nama}</b><span class="origin-tag">📍 ${p.asal}</span></div>
+                            <span>${p.produk} (x${p.jumlah})</span>
+                        </div>`;
+                });
+            }
+        });
+
+        function pesanSekarang(id, namaProduk, harga, stokTersedia) {
+            const nama = document.getElementById('namaPemesan').value.trim();
+            const asal = document.getElementById('asalPemesan').value;
+            const qty = parseInt(document.getElementById('qty_' + id).value); // Mengambil nilai dari kolom qty
+            
+            if (!nama || !asal) { alert("Isi Nama & Pilih Asal!"); return; }
+            if (isNaN(qty) || qty < 1) { alert("Jumlah pesanan tidak valid!"); return; }
+            
+            database.ref('stok_produk/' + id).update({ stok: stokTersedia - qty });
+            database.ref('pesanan/').push({ 
+                nama: nama, asal: asal, produk: namaProduk, jumlah: qty, 
+                totalHarga: harga * qty, waktu: new Date().toLocaleTimeString() 
+            });
+            
+            document.getElementById('qty_' + id).value = 1; // Reset kolom ke angka 1
+        }
+    </script>
+</body>
+</html>
+
 
