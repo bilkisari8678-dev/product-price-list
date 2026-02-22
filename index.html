@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Owen Caffe - Menu & Asal Pesanan</title>
+    <title>Owen Caffe - Stok 1000</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     
@@ -50,9 +50,9 @@
         }
 
         .product-card img { width: 100%; height: 200px; object-fit: cover; border-radius: 10px; margin-bottom: 10px; }
-        .product-card h3 { font-size: 16px; margin: 5px 0; color: #00ffff; }
-        .stok-info { font-size: 13px; color: #ffea00; margin-bottom: 10px; font-weight: bold; }
-        .price { font-weight: bold; color: #00ffff; margin-bottom: 15px; }
+        .product-card h3 { font-size: 16px; margin: 5px 0; color: #00ffff; text-transform: uppercase; }
+        
+        .price { font-weight: bold; color: #00ffff; margin: 10px 0 15px 0; font-size: 1.1rem; }
 
         .order-box {
             background: rgba(0, 255, 255, 0.1); border: 2px solid #00ffff;
@@ -143,10 +143,21 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
+        // Data Produk Awal dengan Stok 1000
+        const produkAwal = {
+            "p1": { nama: "SUSU KEDELAI", harga: 50, stok: 1000, img: "https://down-id.img.susercontent.com/file/b2259a1c15492387e14a0ccfac4fae44" },
+            "p2": { nama: "PEACH GUM", harga: 50, stok: 1000, img: "https://img06.weeecdn.com/item/image/071/142/33FADE5517F5CB2E.jpeg!c750x0.jpeg" },
+            "p3": { nama: "MATCHA", harga: 50, stok: 1000, img: "https://i.pinimg.com/736x/72/03/e6/7203e6b32cf67f664055445ed06cee44.jpg" },
+            "p4": { nama: "KOPI KOKTONG", harga: 50, stok: 1000, img: "https://i.gojekapi.com/darkroom/gofood-indonesia/v2/images/uploads/31ab0769-5603-4e27-88eb-36c8f5828edd_cd05a52f-e51f-473c-a1ff-e54bbb79760e_Go-Biz_20200420_184718.jpeg?auto=format" },
+            "p5": { nama: "MILK TEA", harga: 50, stok: 1000, img: "https://img-global.cpcdn.com/recipes/d905d7c13a69f100/680x781cq80/thai-tea-foto-resep-utama.jpg" }
+        };
+
         // Muat Menu secara Real-time
         database.ref('stok_produk/').on('value', (snapshot) => {
             const data = snapshot.val();
-            if (!data) return;
+            // Jika data kosong, set stok ke 1000 secara otomatis
+            if (!data) { database.ref('stok_produk/').set(produkAwal); return; }
+            
             const container = document.getElementById('menu-container');
             container.innerHTML = "";
             Object.keys(data).forEach((id) => {
@@ -156,7 +167,6 @@
                     <div class="product-card">
                         <img src="${item.img}" alt="${item.nama}">
                         <h3>${item.nama}</h3>
-                        <div class="stok-info">${isHabis ? '<span style="color:red">STOK HABIS</span>' : 'Tersedia: ' + item.stok}</div>
                         <div class="price">B ${item.harga}</div>
                         <input type="number" min="1" value="1" class="quantity" id="qty_${id}" ${isHabis ? 'disabled' : ''}>
                         <button onclick="pesanSekarang('${id}', '${item.nama}', ${item.harga}, ${item.stok})" ${isHabis ? 'disabled' : ''}>
@@ -166,8 +176,8 @@
             });
         });
 
-        // Muat List Antrean Publik
-        database.ref('pesanan/').limitToLast(1000).on('value', (snapshot) => {
+        // Muat Antrean Pesanan
+        database.ref('pesanan/').limitToLast(10).on('value', (snapshot) => {
             const data = snapshot.val();
             const listPublik = document.getElementById('listPemesanPublik');
             listPublik.innerHTML = "";
@@ -178,7 +188,7 @@
                         <div class="order-row">
                             <div style="text-align:left">
                                 <span style="color:#00ffff; font-weight:bold;">${p.nama}</span>
-                                <span class="origin-tag">${p.asal}</span>
+                                <span class="origin-tag">📍 ${p.asal}</span>
                             </div>
                             <span style="font-weight:bold">${p.produk} (x${p.jumlah})</span>
                         </div>`;
@@ -193,8 +203,9 @@
             const qty = parseInt(qtyInput.value);
 
             if (!namaUser || !asalUser) { alert("Harap isi Nama dan pilih Asal Pesanan!"); return; }
-            if (qty > stokTersedia) { alert("Maaf, stok hanya tersisa " + stokTersedia); return; }
+            if (qty > stokTersedia) { alert("Maaf, stok tidak mencukupi."); return; }
 
+            // Mengurangi stok 1000 yang ada di database
             database.ref('stok_produk/' + id).update({ stok: stokTersedia - qty });
             database.ref('pesanan/').push({ 
                 nama: namaUser, asal: asalUser, produk: namaProduk, jumlah: qty, 
@@ -223,4 +234,3 @@
     </script>
 </body>
 </html>
-
