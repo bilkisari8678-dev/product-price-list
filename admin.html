@@ -3,22 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Recap - Owen Caffe</title>
+    <title>Admin Recap - Zen Owen Caffe</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
     
     <style>
         body {
-            /* Menggunakan background animasi Zen Koi */
-            background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+            /* Menggunakan background Zen Koi sesuai link Pinterest Anda */
+            background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
                               url('https://i.pinimg.com/originals/7e/6a/d0/7e6ad031952e85873911f4d36006e877.gif');
             background-size: cover;
             background-attachment: fixed;
             background-position: center;
             color: white;
             font-family: 'Segoe UI', sans-serif;
-            padding: 20px;
             margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
         h1 { 
@@ -27,52 +30,55 @@
             text-shadow: 0 0 15px #00ffff; 
             margin-bottom: 30px;
             text-transform: uppercase;
+            font-size: 1.8rem;
         }
         
-        /* Container Rekap Per Asal */
+        #originDisplay { width: 100%; max-width: 600px; }
+
+        /* Desain Kartu Rekap Glassmorphism */
         .origin-group {
-            background: rgba(0, 0, 0, 0.8); /* Gelap transparan agar kontras dengan background */
-            border: 1px solid #00ffff;
+            background: rgba(0, 0, 0, 0.85);
+            border: 2px solid #00ffff;
             border-radius: 15px;
             margin-bottom: 25px;
             overflow: hidden;
-            backdrop-filter: blur(5px);
-            box-shadow: 0 8px 32px rgba(0, 255, 255, 0.2);
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
         }
 
         .origin-header {
-            background: rgba(0, 255, 255, 0.9);
+            background: #00ffff;
             color: black;
             padding: 12px 20px;
             font-weight: bold;
-            font-size: 1.3rem;
             display: flex;
             justify-content: space-between;
+            align-items: center;
         }
 
-        .origin-content { padding: 20px; }
+        .origin-content { padding: 15px; }
         
         .product-summary {
             display: flex;
             justify-content: space-between;
-            padding: 10px 0;
+            padding: 12px 0;
             border-bottom: 1px solid rgba(0, 255, 255, 0.2);
-            font-size: 1.1rem;
+            font-size: 1rem;
         }
 
-        .product-summary span { color: #00ffff; }
+        .product-summary span { color: #00ffff; font-weight: bold; }
 
         .customer-list {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: #ffea00;
             margin: 15px 0;
             padding: 10px;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 8px;
+            border-left: 3px solid #ffea00;
         }
 
         .btn-clear {
-            background: #ff4444; 
+            background: #ff4d4d; 
             color: white; 
             border: none; 
             padding: 12px;
@@ -80,18 +86,19 @@
             cursor: pointer; 
             font-weight: bold; 
             width: 100%; 
+            text-transform: uppercase;
             transition: 0.3s;
         }
 
-        .btn-clear:hover { background: #b30000; transform: scale(1.01); }
+        .btn-clear:hover { background: #ff1a1a; box-shadow: 0 0 10px #ff4d4d; }
     </style>
 </head>
 <body>
 
     <h1>📊 REKAP TOTAL PER ASAL</h1>
     
-    <div id="originDisplay" style="max-width: 800px; margin: 0 auto;">
-        <p style="text-align: center; color: #888;">Menghubungkan ke kolam pesanan...</p>
+    <div id="originDisplay">
+        <p style="text-align: center; color: #888;">Menyelam mencari data...</p>
     </div>
 
     <script>
@@ -115,17 +122,13 @@
             if (data) {
                 const totalsByOrigin = {};
 
-                // Proses hitung total per asal (Contoh: GOL)
+                // Proses akumulasi pesanan (Contoh: Roni & Icha dari GOL)
                 Object.keys(data).forEach((id) => {
                     const p = data[id];
                     const asal = p.asal || "Tanpa Asal";
                     
                     if (!totalsByOrigin[asal]) {
-                        totalsByOrigin[asal] = {
-                            produk: {},
-                            pembeli: [],
-                            ids: []
-                        };
+                        totalsByOrigin[asal] = { produk: {}, pembeli: [], ids: [] };
                     }
 
                     if (!totalsByOrigin[asal].produk[p.produk]) {
@@ -139,7 +142,7 @@
                     totalsByOrigin[asal].ids.push(id);
                 });
 
-                // Tampilkan hasil grup
+                // Tampilkan hasil grup sesuai contoh yang Anda minta
                 Object.keys(totalsByOrigin).forEach((asal) => {
                     const group = totalsByOrigin[asal];
                     let productHtml = "";
@@ -161,7 +164,7 @@
                             <div class="origin-content">
                                 ${productHtml}
                                 <div class="customer-list">👤 Pembeli: ${group.pembeli.join(', ')}</div>
-                                <button class="btn-clear" onclick="hapusAsal('${group.ids.join(',')}')">HAPUS DATA ${asal}</button>
+                                <button class="btn-clear" onclick="hapusAsal('${group.ids.join(',')}', '${asal}')">HAPUS DATA ${asal}</button>
                             </div>
                         </div>
                     `;
@@ -171,8 +174,8 @@
             }
         });
 
-        function hapusAsal(idsString) {
-            if(confirm("Apakah pesanan untuk grup ini sudah selesai dikirim?")) {
+        function hapusAsal(idsString, asal) {
+            if(confirm("Hapus semua rekap untuk asal " + asal + "?")) {
                 const ids = idsString.split(',');
                 ids.forEach(id => database.ref('pesanan/' + id).remove());
             }
