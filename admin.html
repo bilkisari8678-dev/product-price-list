@@ -113,6 +113,7 @@
             font-size: 0.9rem;
             color: #ffea00;
             border-left: 4px solid #ffea00;
+            line-height: 1.6;
         }
 
         .total-situs {
@@ -185,17 +186,21 @@
                 
                 if (!groups[tglKey]) groups[tglKey] = {};
                 if (!groups[tglKey][situs]) {
-                    groups[tglKey][situs] = { items: {}, pembeli: [], totalQty: 0 };
+                    groups[tglKey][situs] = { 
+                        items: {}, 
+                        pembeli: {}, // Sekarang objek untuk simpan {Nama: TotalJumlah}
+                        totalQty: 0 
+                    };
                 }
 
                 const qty = parseInt(p.jumlah) || 0;
+                
+                // Hitung Rekap Produk per Situs
                 groups[tglKey][situs].items[p.produk] = (groups[tglKey][situs].items[p.produk] || 0) + qty;
                 groups[tglKey][situs].totalQty += qty;
                 
-                // HANYA NAMA PEMESAN SAJA
-                if (!groups[tglKey][situs].pembeli.includes(p.nama)) {
-                    groups[tglKey][situs].pembeli.push(p.nama);
-                }
+                // Hitung Jumlah Pesanan per Nama Pembeli
+                groups[tglKey][situs].pembeli[p.nama] = (groups[tglKey][situs].pembeli[p.nama] || 0) + qty;
             });
 
             const sortedDates = Object.keys(groups).sort((a,b) => {
@@ -217,9 +222,17 @@
 
                 Object.keys(groups[tgl]).sort().forEach(situs => {
                     const info = groups[tgl][situs];
+                    
+                    // Render HTML Produk
                     let produkHtml = "";
-                    for (const [nama, qty] of Object.entries(info.items)) {
-                        produkHtml += `<div class="produk-row"><span>🥤 ${nama}</span><span>${qty} Botol</span></div>`;
+                    for (const [namaProduk, qtyProduk] of Object.entries(info.items)) {
+                        produkHtml += `<div class="produk-row"><span>🥤 ${namaProduk}</span><span>${qtyProduk} Botol</span></div>`;
+                    }
+
+                    // Render Daftar Nama Pembeli + Jumlahnya
+                    let pembeliList = [];
+                    for (const [namaOrang, totalBeli] of Object.entries(info.pembeli)) {
+                        pembeliList.push(`${namaOrang} <b>(x${totalBeli})</b>`);
                     }
 
                     grid.innerHTML += `
@@ -227,7 +240,10 @@
                             <div class="rekap-header">📍 ${situs}</div>
                             <div class="rekap-body">
                                 ${produkHtml}
-                                <div class="pembeli-box"><b>Nama Pemesan:</b><br>${info.pembeli.join(', ')}</div>
+                                <div class="pembeli-box">
+                                    <b>Daftar Pemesan:</b><br>
+                                    ${pembeliList.join(', ')}
+                                </div>
                             </div>
                             <div class="total-situs">Total: ${info.totalQty} PCS</div>
                             <button class="btn-hapus-situs" onclick="hapusSitus('${tgl}', '${situs}')">Hapus Situs</button>
