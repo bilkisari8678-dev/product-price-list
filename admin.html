@@ -3,79 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Rekap - Owen Caffe</title>
+    <title>Admin PANHA COFFEE by OWEN LOUIS</title>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+    
     <style>
         body {
-            margin: 0; padding: 20px; font-family: 'Segoe UI', sans-serif;
-            background-color: #000; color: #fff;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            font-family: 'Segoe UI', sans-serif;
+            color: white;
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
+                        url('https://i.pinimg.com/originals/3f/44/e1/3f44e122cfc5609777dba1331525c078.gif');
+            background-size: cover;
+            background-attachment: fixed;
+            background-position: center;
         }
 
-        /* Panel Kontrol Atas */
-        .admin-header {
-            background: #111; border: 2px solid #00ffff; padding: 20px;
-            border-radius: 15px; margin-bottom: 30px; text-align: center;
+        h1 { 
+            text-align: center; 
+            color: #00ffff; 
+            text-shadow: 0 0 15px #00ffff; 
+            text-transform: uppercase; 
+            margin-bottom: 40px; 
+            letter-spacing: 2px;
         }
-        .btn-toggle {
-            padding: 10px 25px; border-radius: 8px; border: none; font-weight: bold;
-            cursor: pointer; text-transform: uppercase; margin: 10px;
-        }
-        .btn-on { background: #00ff88; color: #000; }
-        .btn-off { background: #ff4d4d; color: #fff; }
 
-        /* Grid Card Situs */
+        .tanggal-group {
+            border: 1px solid rgba(0, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 50px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .tanggal-label {
+            background: #ffea00;
+            color: black;
+            padding: 12px 30px;
+            display: inline-block;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 1.3rem;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 15px rgba(255, 234, 0, 0.3);
+        }
+
+        .btn-hapus-tgl {
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            float: right;
+            font-weight: bold;
+            text-transform: uppercase;
+            transition: 0.3s;
+        }
+        .btn-hapus-tgl:hover { background: #cc0000; transform: scale(1.05); }
+
         .rekap-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(3, 1fr); 
+            gap: 25px;
+            clear: both;
         }
 
-        .card-situs {
-            background: #000; border: 2px solid #00ffff;
-            border-radius: 10px; overflow: hidden; display: flex; flex-direction: column;
+        .rekap-card {
+            background: rgba(20, 20, 20, 0.9);
+            border: 2px solid #00ffff;
+            border-radius: 15px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: 0.3s;
+        }
+        .rekap-card:hover { border-color: #ffea00; transform: translateY(-5px); }
+
+        .rekap-header {
+            background: #00ffff;
+            color: black;
+            padding: 12px;
+            font-weight: bold;
+            text-align: center;
+            text-transform: uppercase;
+            font-size: 1.1rem;
         }
 
-        .header-situs {
-            background: #00ffff; color: #000; padding: 10px;
-            text-align: center; font-weight: bold; font-size: 1.1rem;
-        }
-
-        .body-situs { padding: 15px; flex-grow: 1; }
+        .rekap-body { padding: 15px; flex-grow: 1; }
 
         .produk-row {
-            display: flex; justify-content: space-between;
-            padding: 5px 0; color: #00ffff; font-weight: bold; border-bottom: 1px solid #222;
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0, 255, 255, 0.2);
+            font-weight: bold;
+            color: #00ffff;
         }
 
         .pembeli-box {
-            margin-top: 15px; background: rgba(255, 255, 255, 0.05);
-            padding: 10px; border-radius: 5px; border-left: 3px solid #ffea00;
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #ffea00;
+            border-left: 4px solid #ffea00;
+            line-height: 1.6;
         }
-        .pembeli-title { color: #ffea00; font-weight: bold; font-size: 0.9rem; display: block; margin-bottom: 5px; }
-        .pembeli-list { color: #fff; font-size: 0.9rem; }
 
-        .footer-situs {
-            background: rgba(0, 255, 255, 0.1); padding: 10px;
-            text-align: center; font-weight: bold; border-top: 1px solid #00ffff;
+        .total-situs {
+            background: rgba(0, 255, 255, 0.1);
+            color: white;
+            padding: 12px;
+            text-align: center;
+            font-weight: bold;
+            border-top: 1px solid #00ffff;
+            font-size: 1rem;
         }
 
         .btn-hapus-situs {
-            background: #ff4d4d; color: white; border: none;
-            padding: 10px; cursor: pointer; width: 100%; font-weight: bold;
+            background: #ff4d4d;
+            color: white;
+            border: none;
+            padding: 12px;
+            cursor: pointer;
+            font-weight: bold;
+            width: 100%;
+            text-transform: uppercase;
         }
+
+        @media (max-width: 1100px) { .rekap-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 750px) { .rekap-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
-    <div class="admin-header">
-        <h1 style="margin: 0 0 10px 0; color: #00ffff;">PANHA COFFEE REKAP</h1>
-        <div id="statusToko" style="font-size: 1.2rem; margin-bottom: 10px;">Status: ...</div>
-        <button id="btnToggle" class="btn-toggle" onclick="toggleToko()">Memuat...</button>
-        <button onclick="hapusSemua()" class="btn-toggle" style="background: #555; color: white;">HAPUS SEMUA DATA</button>
-    </div>
-
-    <div class="rekap-grid" id="containerRekap"></div>
+    <h1>📊 REKAP PESANAN PANHA COFFEE</h1>
+    <div id="masterAdmin"></div>
 
     <script>
         const firebaseConfig = {
@@ -86,85 +155,132 @@
             storageBucket: "owen-caffe.firebasestorage.app",
             appId: "1:374030985787:web:1f9ddf8ecf3d8d1cb58a1e"
         };
+
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        // 1. Logika Buka/Tutup
-        let statusSekarang = false;
-        database.ref('config/toko_buka').on('value', (s) => {
-            statusSekarang = s.val();
-            const btn = document.getElementById('btnToggle');
-            const label = document.getElementById('statusToko');
-            label.innerHTML = statusSekarang ? "🟢 STATUS: TOKO BUKA" : "🔴 STATUS: TOKO TUTUP";
-            btn.innerHTML = statusSekarang ? "TUTUP TOKO" : "BUKA TOKO";
-            btn.className = statusSekarang ? "btn-toggle btn-off" : "btn-toggle btn-on";
-        });
+        function formatTanggalIndo(tglString) {
+            const bulanIndo = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            const part = tglString.split('-'); 
+            if (part.length !== 3) return tglString;
+            return `${parseInt(part[0])} ${bulanIndo[parseInt(part[1]) - 1]} ${part[2]}`;
+        }
 
-        function toggleToko() { database.ref('config/toko_buka').set(!statusSekarang); }
+        function getTodayDate() {
+            const d = new Date();
+            return `${String(d.getDate()).padStart(2, '0')}-${String(d.getMonth() + 1).padStart(2, '0')}-${d.getFullYear()}`;
+        }
 
-        // 2. Logika Rekap Sesuai Gambar
         database.ref('pesanan/').on('value', (snapshot) => {
             const data = snapshot.val();
-            const container = document.getElementById('containerRekap');
-            container.innerHTML = "";
+            const master = document.getElementById('masterAdmin');
+            master.innerHTML = "";
 
             if (!data) return;
 
-            // Kelompokkan data
             const groups = {};
             Object.keys(data).forEach(id => {
                 const p = data[id];
+                let tglKey = p.tanggal || getTodayDate();
                 const situs = p.SITUS || "LAIN-LAIN";
-                if (!groups[situs]) groups[situs] = { produk: {}, pembeli: {}, total: 0 };
                 
-                const qty = parseInt(p.jumlah) || 1;
-                groups[situs].produk[p.produk] = (groups[situs].produk[p.produk] || 0) + qty;
-                groups[situs].pembeli[p.nama] = (groups[situs].pembeli[p.nama] || 0) + qty;
-                groups[situs].total += qty;
+                if (!groups[tglKey]) groups[tglKey] = {};
+                if (!groups[tglKey][situs]) {
+                    groups[tglKey][situs] = { 
+                        items: {}, 
+                        pembeli: {}, // Sekarang objek untuk simpan {Nama: TotalJumlah}
+                        totalQty: 0 
+                    };
+                }
+
+                const qty = parseInt(p.jumlah) || 0;
+                
+                // Hitung Rekap Produk per Situs
+                groups[tglKey][situs].items[p.produk] = (groups[tglKey][situs].items[p.produk] || 0) + qty;
+                groups[tglKey][situs].totalQty += qty;
+                
+                // Hitung Jumlah Pesanan per Nama Pembeli
+                groups[tglKey][situs].pembeli[p.nama] = (groups[tglKey][situs].pembeli[p.nama] || 0) + qty;
             });
 
-            // Render Card
-            Object.keys(groups).sort().forEach(situs => {
-                const info = groups[situs];
-                let produkHtml = "";
-                for (let prod in info.produk) {
-                    produkHtml += `<div class="produk-row"><span>🥤 ${prod}</span><span>${info.produk[prod]} Botol</span></div>`;
-                }
+            const sortedDates = Object.keys(groups).sort((a,b) => {
+                const da = a.split('-').reverse().join('');
+                const db = b.split('-').reverse().join('');
+                return db.localeCompare(da);
+            });
 
-                let pembeliList = [];
-                for (let nama in info.pembeli) {
-                    pembeliList.push(`${nama} <span style="color:#ffea00;">(x${info.pembeli[nama]})</span>`);
-                }
-
-                container.innerHTML += `
-                    <div class="card-situs">
-                        <div class="header-situs">📍 ${situs}</div>
-                        <div class="body-situs">
-                            ${produkHtml}
-                            <div class="pembeli-box">
-                                <span class="pembeli-title">Daftar Pemesan:</span>
-                                <div class="pembeli-list">${pembeliList.join(', ')}</div>
-                            </div>
-                        </div>
-                        <div class="footer-situs">Total: ${info.total} PCS</div>
-                        <button class="btn-hapus-situs" onclick="hapusSitus('${situs}')">HAPUS SITUS</button>
-                    </div>
+            sortedDates.forEach(tgl => {
+                const section = document.createElement('div');
+                section.className = 'tanggal-group';
+                section.innerHTML = `
+                    <button class="btn-hapus-tgl" onclick="hapusTanggal('${tgl}')">Hapus Hari Ini</button>
+                    <div class="tanggal-label">🗓️ ${formatTanggalIndo(tgl)}</div>
                 `;
+                
+                const grid = document.createElement('div');
+                grid.className = 'rekap-grid';
+
+                Object.keys(groups[tgl]).sort().forEach(situs => {
+                    const info = groups[tgl][situs];
+                    
+                    // Render HTML Produk
+                    let produkHtml = "";
+                    for (const [namaProduk, qtyProduk] of Object.entries(info.items)) {
+                        produkHtml += `<div class="produk-row"><span>🥤 ${namaProduk}</span><span>${qtyProduk} Botol</span></div>`;
+                    }
+
+                    // Render Daftar Nama Pembeli + Jumlahnya
+                    let pembeliList = [];
+                    for (const [namaOrang, totalBeli] of Object.entries(info.pembeli)) {
+                        pembeliList.push(`${namaOrang} <b>(x${totalBeli})</b>`);
+                    }
+
+                    grid.innerHTML += `
+                        <div class="rekap-card">
+                            <div class="rekap-header">📍 ${situs}</div>
+                            <div class="rekap-body">
+                                ${produkHtml}
+                                <div class="pembeli-box">
+                                    <b>Daftar Pemesan:</b><br>
+                                    ${pembeliList.join(', ')}
+                                </div>
+                            </div>
+                            <div class="total-situs">Total: ${info.totalQty} PCS</div>
+                            <button class="btn-hapus-situs" onclick="hapusSitus('${tgl}', '${situs}')">Hapus Situs</button>
+                        </div>`;
+                });
+
+                section.appendChild(grid);
+                master.appendChild(section);
             });
         });
 
-        function hapusSitus(situs) {
-            if(confirm("Hapus pesanan situs " + situs + "?")) {
+        function hapusSitus(tgl, situs) {
+            if (confirm(`Hapus data ${situs} untuk tanggal ${tgl}?`)) {
                 database.ref('pesanan/').once('value', (snap) => {
                     snap.forEach((child) => {
-                        if (child.val().SITUS === situs) child.ref.remove();
+                        const p = child.val();
+                        const tglData = p.tanggal || getTodayDate();
+                        if (tglData === tgl && (p.SITUS === situs || (!p.SITUS && situs === "LAIN-LAIN"))) {
+                            child.ref.remove();
+                        }
                     });
                 });
             }
         }
 
-        function hapusSemua() {
-            if(confirm("Hapus SEMUA data pesanan hari ini?")) database.ref('pesanan/').remove();
+        function hapusTanggal(tgl) {
+            if (confirm(`Hapus SEMUA data untuk tanggal ${tgl}?`)) {
+                database.ref('pesanan/').once('value', (snap) => {
+                    snap.forEach((child) => {
+                        const p = child.val();
+                        const tglData = p.tanggal || getTodayDate();
+                        if (tglData === tgl) {
+                            child.ref.remove();
+                        }
+                    });
+                });
+            }
         }
     </script>
 </body>
